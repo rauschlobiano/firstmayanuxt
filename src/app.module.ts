@@ -10,19 +10,11 @@ import { ItemsController } from "./controllers/items.controller";
 //services
 import { PostransServices } from "./controllers/postrans.service";
 import { ItemsServices } from "./services/items.service";
-//test
-import { TestController } from "./test/test.controller";
-import { TestServices } from "./test/test.service";
 
 @Module({
-  declarations: [
-    AppController,
-    TestController,
-    PostransController,
-    ItemsController,
-  ],
+  declarations: [AppController, PostransController, ItemsController],
   imports: [RouterModule.forRoot(routes), MongoDbModule.forRoot(mongoOptions)],
-  providers: [TestServices, MongoDbServices, PostransServices, ItemsServices],
+  providers: [MongoDbServices, PostransServices, ItemsServices],
   bootstrap: AppController,
 })
 export class AppModule {}

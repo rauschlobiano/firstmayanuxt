@@ -9,17 +9,32 @@ export class ItemsServices {
   }
   constructor(private mongo: MongoDbServices) {}
 
+  //returns all items
   async getAll() {
-    try {
-      const tests = await this.model.find({});
-      console.log(tests);
-      return { message: tests };
-    } catch (ex) {
-      console.log(ex);
-      return ex;
-    }
+    return await this.model.find({});
   }
+
+  //creates a new item
   async createNew(body: {}) {
     return await this.model.create(body);
+  }
+
+  //returns a specific item using the id
+  async findById(params: {}) {
+    return await this.model.findOne(params);
+  }
+
+  //updates a single item and returns the updated item
+  async findUpdate(body: {}, params: {}) {
+    let res = await this.model.findOneAndUpdate(params, body, {
+      useFindAndModify: false,
+    });
+    let updated = await this.model.findOne(params);
+    return updated;
+  }
+
+  //deletes a single item
+  async deleteById(params: {}) {
+    return await this.model.deleteOne(params);
   }
 }
