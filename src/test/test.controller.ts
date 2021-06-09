@@ -6,29 +6,16 @@ import { MongoDbServices } from "@mayajs/mongo";
 
 @Controller()
 export class TestController {
-  get model() {
-    const db = this.mongo.database("con1");
-    return db.instance.model("Test");
-  }
   constructor(private services: TestServices, private mongo: MongoDbServices) {}
 
   @Post()
   async createTest({ body }: MayaJsContext): Promise<any> {
-    const res = await this.model.create(body);
-    return res;
+    return await this.services.createNew({ body });
   }
 
   @Get()
   async readTest(): Promise<any> {
-    // Read all Test list
-    try {
-      const tests = await this.model.find({});
-      console.log(tests);
-      return { message: tests };
-    } catch (ex) {
-      console.log(ex);
-      return ex;
-    }
+    return this.services.getAll();
   }
 
   @Get("/:id")

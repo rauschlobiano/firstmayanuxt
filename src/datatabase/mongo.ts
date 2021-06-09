@@ -1,6 +1,7 @@
 import env from "../environments";
-import addressModel from "../models/address.model";
 import Test from "../test/test.model";
+import Postrans from "../models/postrans.model";
+import Item from "../models/item.model";
 
 export const mongoOptions = {
   connectionString: env.mongo_conn,
@@ -11,5 +12,5 @@ export const mongoOptions = {
     useUnifiedTopology: true,
     useFindAndModify: true,
   },
-  schemas: [Test, addressModel],
+  schemas: [Test, Postrans, Item],
 };

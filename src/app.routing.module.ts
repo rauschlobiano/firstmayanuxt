@@ -1,4 +1,5 @@
-import { AddressController } from "./controllers/address/address.controller";
+import { ItemsController } from "./controllers/items.controller";
+import { PostransController } from "./controllers/postrans.controller";
 import { TestController } from "./test/test.controller";
 
 export const routes = [
@@ -7,7 +8,11 @@ export const routes = [
     controller: TestController,
   },
   {
-    path: "addresses",
-    controller: AddressController,
+    path: "postrans",
+    controller: PostransController,
+  },
+  {
+    path: "items",
+    controller: ItemsController,
   },
 ];
