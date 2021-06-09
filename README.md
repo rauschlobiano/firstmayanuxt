@@ -13,15 +13,19 @@ Run `maya serve` or `maya s` to run the server. Navigate to `http://localhost:33
 Run `maya generate <service | controller | model | route> < name | directory >` to create a new component.
 
 ### Create controller
+
 > maya generate controller name-of-controller
 
 ### Create service
+
 > maya generate service name-of-service
 
 ### Create model
+
 > maya generate model name-of-model
 
 ### Create route
+
 > maya generate route name-of-route
 
 ## Build
@@ -29,3 +33,5 @@ Run `maya generate <service | controller | model | route> < name | directory >` 
 Run `maya build` or `maya b` to build the project. Use the `--prod` flag for a production build. The build files will be created in the `dist/` directory.
 
 > maya build
+
+test edit
