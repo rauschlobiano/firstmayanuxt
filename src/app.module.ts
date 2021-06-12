@@ -5,16 +5,28 @@ import { AppController } from "./app.controller";
 import { MongoDbModule, MongoDbServices } from "@mayajs/mongo";
 import { mongoOptions } from "./datatabase/mongo";
 //controllers
-import { PostransController } from "./controllers/postrans.controller";
+import { ProfilesController } from "./controllers/profiles.controller";
 import { ItemsController } from "./controllers/items.controller";
+import { TaggingsController } from "./controllers/taggings.controller";
 //services
-import { PostransServices } from "./controllers/postrans.service";
+import { ProfilesServices } from "./services/profiles.service";
 import { ItemsServices } from "./services/items.service";
+import { TaggingsServices } from "./services/taggings.service";
 
 @Module({
-  declarations: [AppController, PostransController, ItemsController],
+  declarations: [
+    AppController,
+    ProfilesController,
+    ItemsController,
+    TaggingsController,
+  ],
   imports: [RouterModule.forRoot(routes), MongoDbModule.forRoot(mongoOptions)],
-  providers: [MongoDbServices, PostransServices, ItemsServices],
+  providers: [
+    MongoDbServices,
+    ProfilesServices,
+    ItemsServices,
+    TaggingsServices,
+  ],
   bootstrap: AppController,
 })
 export class AppModule {}

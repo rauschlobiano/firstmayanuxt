@@ -1,13 +1,18 @@
 import { ItemsController } from "./controllers/items.controller";
-import { PostransController } from "./controllers/postrans.controller";
+import { ProfilesController } from "./controllers/profiles.controller";
+import { TaggingsController } from "./controllers/taggings.controller";
 
 export const routes = [
   {
-    path: "postrans",
-    controller: PostransController,
+    path: "profiles",
+    controller: ProfilesController,
   },
   {
     path: "items",
     controller: ItemsController,
+  },
+  {
+    path: "taggings",
+    controller: TaggingsController,
   },
 ];

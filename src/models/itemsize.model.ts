@@ -1,22 +1,17 @@
 import { Schema } from "mongoose";
 
 export default {
-  name: "Item",
+  name: "ItemSize",
   schema: new Schema(
     {
-      itemcode: {
+      name: {
         type: String,
-        required: [true, "Item Code is required."],
+        required: [true, "Name is required."],
       },
-      itemdescrip: {
-        type: String,
-        required: [true, "Item Description is required."],
+      price: {
+        type: Number,
+        required: [true, "Price is required."],
       },
-      supplierprofid: {
-        type: String,
-        required: [true, "Supplier is required."],
-      },
-
       createdBy: {
         type: String,
         required: [true, "Created by is required."],

@@ -1,6 +1,6 @@
 import { Service } from "@mayajs/core";
 
 @Service()
-export class PostransServices {
+export class ItempricesServices {
   constructor() {}
 }

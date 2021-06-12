@@ -2,17 +2,20 @@ import { Service } from "@mayajs/core";
 import { MongoDbServices } from "@mayajs/mongo";
 
 @Service()
-export class ItemsServices {
+export class ProfilesServices {
   get model() {
     const db = this.mongo.database("con1");
-    return db.instance.model("Item");
+    return db.instance.model("Profile");
   }
   constructor(private mongo: MongoDbServices) {}
 
   //returns all items
   async getAll() {
     return await this.model.find({});
-    //.sort({ _id: -1 });
+  }
+
+  async getAllSuppliers() {
+    return await this.model.find({ proftype: "98" }, { accountname: 1 });
   }
 
   //creates a new item

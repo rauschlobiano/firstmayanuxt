@@ -1,17 +1,11 @@
 import { Get, Patch, Post, Delete, Put } from "@mayajs/common";
 import { MayaJsContext } from "@mayajs/router";
 import { Controller } from "@mayajs/core";
-import { ItemsServices } from "../services/items.service";
-@Controller()
-export class ItemsController {
-  constructor(private services: ItemsServices) {}
+import { ProfilesServices } from "../services/profiles.service";
 
-  @Post()
-  async createItems({ body }: MayaJsContext): Promise<any> {
-    body.editedBy = "Me haha";
-    body.createdBy = "Me haha";
-    return this.services.createNew(body);
-  }
+@Controller()
+export class ProfilesController {
+  constructor(private services: ProfilesServices) {}
 
   @Get()
   async readItems(): Promise<any> {
@@ -22,6 +16,18 @@ export class ItemsController {
   @Get("/:_id")
   async readItemsByID({ params }: MayaJsContext): Promise<any> {
     return await this.services.findById(params);
+  }
+  @Get("/suppliers")
+  async getAllSuppliers({ params }: MayaJsContext): Promise<any> {
+    //98 is supplier
+    return await this.services.getAllSuppliers();
+  }
+
+  @Post()
+  async createItems({ body }: MayaJsContext): Promise<any> {
+    body.editedBy = "Me haha";
+    body.createdBy = "Me haha";
+    return this.services.createNew(body);
   }
 
   @Patch("/:_id")
