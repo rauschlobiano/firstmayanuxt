@@ -1,0 +1,85 @@
+html,
+body {
+  background-color: #fff;
+  color: #2e2f30;
+  letter-spacing: 0.5px;
+  font-family: "Roboto", Arial, sans-serif;
+  height: 100vh;
+  margin: 0;
+}
+
+footer {
+  padding: 20px;
+  text-align: center;
+  border-top: 1px solid #ddd;
+}
+
+a,
+a:hover,
+a:focus,
+a:visited {
+  color: #744d82;
+}
+
+.fromcustom {
+  background-color: yellow;
+}
+
+.centered-input input {
+  text-align: center;
+}
+.dtheaderbg {
+  background-color: rgb(145, 173, 175);
+}
+.right-input input {
+  text-align: right;
+}
+.v-text-field.v-text-field--solo .v-input__control {
+  min-height: 10px;
+  max-height: 30px;
+  font-size: 0.5em;
+}
+.v-data-table > .v-data-table__wrapper > table > tbody > tr > td {
+  font-size: 10px;
+}
+
+.compact-form {
+  transform: scale(0.875);
+  transform-origin: left;
+}
+
+.custom-highlight-row {
+  background-color: pink;
+}
+
+input::placeholder {
+  color: red !important;
+  font-size: 10px;
+}
+
+#draggable-container-profile {
+  position: absolute;
+  z-index: 9;
+  width: 900px;
+}
+
+#draggable-header-profile {
+  z-index: 10;
+  padding-left: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background-color: #39465e;
+}
+
+#draggable-container-sellitem {
+  position: absolute;
+  z-index: 9;
+  width: 600px;
+}
+#draggable-header-sellitem {
+  z-index: 10;
+  padding-left: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background-color: rgb(65, 67, 160);
+}

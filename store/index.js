@@ -4,12 +4,19 @@ export const state = () => ({
   counter: 123,
   profileslistdata: [],
   profilesarray: [],
+
+  genders: [],
+  civilstats: [],
+  accountstats: [],
+  profgroups: [],
+  clientgroups: [],
+  pricecodes: [],
+
   itemslistdata: [],
   itemsarray: [],
   itemsizes: [],
   itemsizepieces: [],
   itemprices: [],
-  itempricecodes: [],
   itempricing: [],
   itemselltrans: [],
   vendorslistdata: [],
@@ -57,22 +64,32 @@ export const mutations = {
   updateItemPrice(state, newlist){
     state.itemprices = newlist
   },
-  updateItemPriceCode(state, newlist){
-    state.itempricecodes = newlist
-  },
   updateItemSellTrans(state, newlist){
     state.itemselltrans = newlist
   },
-
 
   //vendors
   updateVendorList(state, newlist){
     state.vendorslistdata = newlist
   },
-  //profile types
+
+  //taggings
   updateProfileTypeList(state, newlist){
     state.profiletypedata = newlist
   },
+  updateGenderList(state, newlist){
+    state.genders = newlist
+  },
+  updateAccountStatsList(state, newlist){
+    state.accountstats = newlist
+  },
+  updateProfGroupList(state, newlist){
+    state.profgroups = newlist
+  },
+  updatePriceCode(state, newlist){
+    state.pricecodes = newlist
+  },
+
 
 
   mutateZindex(state){

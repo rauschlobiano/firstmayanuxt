@@ -28,7 +28,7 @@
                 :items-per-page="15" class="elevation-1 my-0" :search="search">
                 <template v-slot:body="{ items }">
                   <tbody>
-                  <tr v-for="item in items" :key="item.iteminfoid" @click="selectItem(item)"
+                  <tr v-for="item in items" :key="item._id" @click="selectItem(item)"
                   :class="{'selectedRow': item.itemcode == iteminfo.itemcode}">
                     <td>{{ item.itemdescrip }}</td>
                   </tr>
@@ -77,18 +77,18 @@
                             <v-col cols="12">
                               <v-select v-model="iteminfo.supplierprofid" dense :rules="inputRules"
                               :items="this.$store.state.vendorslistdata" label="Supplier" item-text="accountname"
-                                item-value="profid" @change="changetrigger" >
+                                item-value="_id" @change="changetrigger" >
                                 </v-select>
                             </v-col>
                           </v-row>
-                          <v-row dense>
+                          <v-row dense v-if="!creating">
                               <v-col cols="12" md="6">
-                                <v-text-field v-model="iteminfo.editedby" label="Edited by" readonly>
+                                <v-text-field v-model="iteminfo.editedBy" label="Edited by" readonly>
 
                                 </v-text-field>
                               </v-col>
                               <v-col cols="12" md="6">
-                                <v-text-field v-model="iteminfo.updated_at" label="Edited on" readonly>
+                                <v-text-field v-model="iteminfo.updatedAt" label="Edited on" readonly>
 
                                 </v-text-field>
                               </v-col>
@@ -167,8 +167,8 @@ export default {
         itemcode: '',
         itemdescrip: '',
         supplierprofid: '',
-        editedon: '',
-        editedby: '',
+        updatedAt: '',
+        editedBy: '',
       },
       inputRules: [
         v => !!v || 'Address ID is required',
@@ -209,67 +209,13 @@ export default {
   methods: {
     ...mapMutations(['incrementCounter','closeProfile', 'mutateZindex']),
 
-    async changetrigger(event){
-      if(!this.creating){
-        this.valid = this.$refs.form.validate()
-        if(this.valid){
-          try{
-            let res = await this.callApi('post', '/updateitem', this.iteminfo)
-            console.log(res)
-            if(res){
-              this.tellParentToUpdate()
-            }
-          }catch(ex){
-            console.log(ex)
-          }
-        }
-      }
-    },
-    async deleteitem(){
-      this.showdialog = false
-      console.log('deleting item...');
-      if(!this.creating) {
-        try{
-          let res = await this.callApi('post', '/deleteitem', this.iteminfo)
-          console.log(res)
-          if(res.data){
-            this.snackbar = true
-            this.snackbartext = "Item Deleted!"
-            this.tellParentToUpdate()
-            this.createnew()
-          }
-        }catch(ex){
-          console.log(ex)
-        }
-      }
-
-    },
-    tellParentToUpdate(){
-      this.$emit('reupdateitemlist')
-    },
-	 selectItem (item) {
-      this.iteminfo.iteminfoid= item.iteminfoid
-      this.iteminfo.itemcode = item.itemcode
-      this.iteminfo.itemdescrip = item.itemdescrip
-      this.iteminfo.supplierprofid = item.supplierprofid
-      this.iteminfo.updated_at = item.updated_at ? moment(item.updated_at).format('MMM DD yyyy hh:mm:ss A') : ''
-      this.iteminfo.editedby = item.editedby
-
-      this.creating = false
-    },
-    createnew(){
-      this.creating = true
-      this.cleanform()
-      this.$refs.form.reset()
-      this.$refs.form.resetValidation()
-    },
     async saveitem(){
       if(this.creating){
         this.valid = this.$refs.form.validate()
 
         if(this.valid){
           try{
-            let res = await this.callApi('post', '/createitem', this.iteminfo)
+            let res = await this.callApi('post', '/items', this.iteminfo)
             console.log(res)
             if(res){
               this.snackbar = true
@@ -287,6 +233,65 @@ export default {
         }
       }
     },
+
+    async changetrigger(event){
+      if(!this.creating){
+        this.valid = this.$refs.form.validate()
+        if(this.valid){
+          try{
+            let res = await this.callApi('PATCH', '/items/'+this.iteminfo._id, this.iteminfo)
+            console.log(res)
+            if(res){
+              this.tellParentToUpdate()
+            }
+          }catch(ex){
+            console.log(ex)
+          }
+        }
+      }
+    },
+
+    async deleteitem(){
+      this.showdialog = false
+      console.log('deleting item...');
+      if(!this.creating) {
+        try{
+          let res = await this.callApi('DELETE', '/items/'+this.iteminfo._id, {})
+          console.log(res)
+          if(res.data){
+            this.snackbar = true
+            this.snackbartext = "Item Deleted!"
+            this.tellParentToUpdate()
+            this.createnew()
+          }
+        }catch(ex){
+          console.log(ex)
+        }
+      }
+    },
+
+    tellParentToUpdate(){
+      this.$emit('reupdateitemlist')
+    },
+
+	  selectItem (item) {
+      this.iteminfo._id= item._id
+      this.iteminfo.itemcode = item.itemcode
+      this.iteminfo.itemdescrip = item.itemdescrip
+      this.iteminfo.supplierprofid = item.supplierprofid
+      this.iteminfo.updatedAt = item.updatedAt ? moment(item.updatedAt).format('MMM DD yyyy hh:mm:ss A') : ''
+      this.iteminfo.editedBy = item.editedBy
+
+      this.creating = false
+    },
+
+    createnew(){
+      this.creating = true
+      this.cleanform()
+      this.$refs.form.reset()
+      this.$refs.form.resetValidation()
+    },
+
     cleanform(){
       this.iteminfo.iteminfoid = ''
       this.iteminfo.itemcode = ''
@@ -295,6 +300,7 @@ export default {
       this.iteminfo.editedon = ''
       this.iteminfo.editedby = ''
     },
+
     incrementZindex(){
       //if form is still shown
       if(this.showflag){
@@ -303,9 +309,11 @@ export default {
         this.mutateZindex()
       }
     },
+
     hideform() {
       this.unishowprofile = !this.unishowprofile
     },
+
     tellParentToHideThis(){
       this.$emit('formclose', false)
     },
@@ -318,6 +326,7 @@ export default {
       document.onmousemove = this.elementDrag
       document.onmouseup = this.closeDragElement
     },
+
     elementDrag: function (event) {
       event.preventDefault()
       this.positions.movementX = this.positions.clientX - event.clientX
@@ -328,6 +337,7 @@ export default {
       this.$refs.draggableContainerItem.style.top = (this.$refs.draggableContainerItem.offsetTop - this.positions.movementY) + 'px'
       this.$refs.draggableContainerItem.style.left = (this.$refs.draggableContainerItem.offsetLeft - this.positions.movementX) + 'px'
     },
+
     closeDragElement () {
       document.onmouseup = null
       document.onmousemove = null

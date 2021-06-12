@@ -9,12 +9,16 @@ Vue.use(Vuetify);
 //the methods here will be used throughout the app
 Vue.mixin({
   methods: {
-    async callApi(method, url, dataParams) {
+
+    async callApi(method, url, dataBody) {
       try {
         let data = await this.$axios({
+          headers: {
+            'Access-Control-Allow-Origin' : '*',
+          },
           method: method,
           url: url,
-          params: dataParams
+          data: dataBody,
         })
         return data;
       }

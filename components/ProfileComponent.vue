@@ -22,80 +22,129 @@
 
               <v-container>
               <v-row>
-                <v-col cols="12" md="3">
-                  <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details></v-text-field>
-                  <v-data-table :headers="headers" :items="this.$store.state.profileslistdata" item-key="address_id "
-					          :items-per-page="12" class="elevation-1 my-0" :search="search"
-                  >
-          <template v-slot:body="{ items }">
-						<tbody>
-						<tr v-for="item in items" :key="item.address_id" @click="rowClicked(item)" :class="{'selectedRow': item.address_id == profileinfo.address_id}">
-							<td>{{ item.address_id }}</td>
+                <v-col cols="12" md="4">
+                  <v-text-field dense v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details></v-text-field>
+                  <v-data-table dense height="500px" :headers="headers" :items="this.$store.state.profileslistdata" item-key="_id "
+					          :items-per-page="12" class="elevation-1 my-0" :search="search">
+                    <template v-slot:body="{ items }">
+                      <tbody>
+                      <tr v-for="item in items" :key="item._id" @click="rowClicked(item)" :class="{'selectedRow': item._id == profileinfo._id}">
+                        <td>{{ item.accountname }}</td>
 
-						</tr>
-						</tbody>
-					</template>
-            </v-data-table>
+                      </tr>
+                      </tbody>
+                    </template>
+                  </v-data-table>
                 </v-col>
-                <v-col cols="12" md="9">
+                <v-col cols="12" md="8">
                   <v-form v-model="valid" ref="form" lazy-validation >
                     <v-container>
                       <v-row>
                         <v-spacer></v-spacer>
-                        <v-btn x-small light fab color="primary" @click="createnew" depressed class="mr-2">
+                        <v-btn x-small light fab color="primary" @click="createnew" v-if="!creating" depressed class="mr-2">
                           <v-icon>mdi-plus</v-icon>
                         </v-btn>
                          <v-btn color="error" x-small @click="deleteprofile" v-if="!creating" depressed fab>
                           <v-icon small>mdi-minus</v-icon>
                         </v-btn>
                       </v-row>
+
                       <v-row>
-                        <v-col cols="12" md="3" >
-                          <v-text-field v-model="profileinfo.address_id" :rules="addressIDRules"
-                          :counter="6" label="Address ID" @change="profchange"></v-text-field>
-                        </v-col>
-                        <v-col cols="12" md="9">
-                          <v-text-field v-model="profileinfo.name" :counter="50"
+                        <v-col cols="9">
+                          <v-text-field dense v-model="profileinfo.accountname" :counter="70"
                           label="Full Name" @change="profchange" :rules="nameRules"></v-text-field>
                         </v-col>
-                      </v-row>
-                      <v-row>
-                        <v-col cols="12" md="3" >
-                          <v-select :items="this.$store.state.profiletypedata" label="Type"
-                          v-model="profileinfo.type" @change="profchange"></v-select>
+                        <v-col cols="3">
+                          <v-text-field dense v-model="profileinfo.previd"
+                          label="Prev ID" @change="profchange"></v-text-field>
                         </v-col>
-                        <v-col cols="12" md="9" >
-                          <v-text-field v-model="profileinfo.email" label="E-mail" @change="profchange"></v-text-field>
+                      </v-row>
+
+                      <v-row>
+                        <v-col cols="4">
+                          <v-text-field dense v-model="profileinfo.fname" label="First" @change="profchange" :counter="30"></v-text-field>
+                        </v-col>
+                        <v-col cols="4">
+                          <v-text-field dense v-model="profileinfo.mname" label="Middle" @change="profchange" :counter="30"></v-text-field>
+                        </v-col>
+                        <v-col cols="4">
+                          <v-text-field dense v-model="profileinfo.lname" label="Last" @change="profchange" :counter="30"></v-text-field>
+                        </v-col>
+                      </v-row>
+
+                      <v-row>
+                        <v-col cols="12" md="4" >
+                          <v-select dense :items="this.$store.state.accountstats" label="Account Status"
+                          v-model="profileinfo.accountstat" @change="profchange"  item-value="accountstatid"
+                          item-text="accountstatdescrip"></v-select>
+                        </v-col>
+                        <v-col cols="12" md="4" >
+                          <v-select dense :items="this.$store.state.profiletypedata" label="Account Type"
+                          v-model="profileinfo.proftype" @change="profchange"  item-value="proftypeid"
+                          item-text="proftypedescrip"></v-select>
+                        </v-col>
+                        <v-col cols="12" md="4" >
+                          <v-select dense :items="this.$store.state.profgroups" label="Group"
+                          v-model="profileinfo.profgroup" @change="profchange"  item-value="profgroupid"
+                          item-text="profgroupdescrip"></v-select>
+                        </v-col>
+                      </v-row>
+
+                      <v-row>
+                        <v-col cols="12" md="4" >
+                          <v-text-field dense v-model="profileinfo.email" label="E-mail" @change="profchange"></v-text-field>
+                        </v-col>
+                        <v-col cols="12" md="4" >
+                          <v-select dense :items="this.$store.state.genders" label="Gender"
+                          v-model="profileinfo.gender" @change="profchange" item-value="genderid"
+                          item-text="genderdescrip"></v-select>
+                        </v-col>
+                        <v-col cols="12" md="4" >
+                          <v-menu ref="menu" v-model="menu" :close-on-content-click="false" transition="scale-transition"
+                            offset-y min-width="auto" >
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-text-field dense v-model="profileinfo.bday"
+                                label="Date of Birth" prepend-icon="mdi-calendar" readonly v-bind="attrs"
+                                v-on="on" ></v-text-field>
+                            </template>
+                            <v-date-picker dense v-model="profileinfo.bday" :active-picker.sync="activePicker"
+                              :max="new Date().toISOString().substr(0, 10)" min="1950-01-01" @change="saveDate" ></v-date-picker>
+                          </v-menu>
+                        </v-col>
+                      </v-row>
+
+                      <v-row>
+
+                      </v-row>
+
+                      <v-row>
+                        <v-col cols="12" md="6" >
+                          <v-text-field dense v-model="profileinfo.phone" label="Phone" @change="profchange"></v-text-field>
+                        </v-col>
+                        <v-col cols="12" md="6" >
+                          <v-text-field dense v-model="profileinfo.fax" label="Fax" @change="profchange"></v-text-field>
                         </v-col>
                       </v-row>
                       <v-row>
                         <v-col cols="12" md="6" >
-                          <v-text-field v-model="profileinfo.phone" label="Phone" @change="profchange"></v-text-field>
+                          <v-text-field dense v-model="profileinfo.address" label="Address 1" @change="profchange"></v-text-field>
                         </v-col>
                         <v-col cols="12" md="6" >
-                          <v-text-field v-model="profileinfo.fax" label="Fax" @change="profchange"></v-text-field>
-                        </v-col>
-                      </v-row>
-                      <v-row>
-                        <v-col cols="12" md="6" >
-                          <v-text-field v-model="profileinfo.address" label="Address 1" @change="profchange"></v-text-field>
-                        </v-col>
-                        <v-col cols="12" md="6" >
-                          <v-text-field v-model="profileinfo.address_2" label="Address 2" @change="profchange"></v-text-field>
+                          <v-text-field dense v-model="profileinfo.address_2" label="Address 2" @change="profchange"></v-text-field>
                         </v-col>
                       </v-row>
                       <v-row>
                         <v-col cols="12" md="3" >
-                          <v-text-field v-model="profileinfo.city" label="City" @change="profchange"></v-text-field>
+                          <v-text-field dense v-model="profileinfo.city" label="City" @change="profchange"></v-text-field>
                         </v-col>
                         <v-col cols="12" md="3" >
-                          <v-text-field v-model="profileinfo.state" label="State" @change="profchange"></v-text-field>
+                          <v-text-field dense v-model="profileinfo.state" label="State" @change="profchange"></v-text-field>
                         </v-col>
                         <v-col cols="12" md="3" >
-                          <v-text-field v-model="profileinfo.zip" label="Zip" @change="profchange"></v-text-field>
+                          <v-text-field dense v-model="profileinfo.zip" label="Zip" @change="profchange"></v-text-field>
                         </v-col>
                         <v-col cols="12" md="3" >
-                          <v-text-field v-model="profileinfo.country" label="Country" @change="profchange"></v-text-field>
+                          <v-text-field dense v-model="profileinfo.country" label="Country" @change="profchange"></v-text-field>
                         </v-col>
                       </v-row>
                       <v-row class="my-3">
@@ -137,6 +186,10 @@ export default {
   data: function () {
     return {
       ...mapState(['counter','profileslistdata','lastzindex','profiletypedata']),
+
+      activePicker: null,
+      menu: false,
+
       search: '',
       valid: false,
       sampletype: ['test1','test2'],
@@ -144,23 +197,44 @@ export default {
       snackbar: false,
       snackbartext: '',
       profileinfo: {
-        id: '',
-        address_id: '',
-        name: '',
+        _id: '',
+        previd: '',
+        accountname: '',
+        fname:'',
+        lname: '',
+        mname: '',
+        bday: '',
         address: '',
         address_2: '',
-        type: '',
-        city: '',
+        createdBy: '',
+        editedBy: '',
+        billaddr1: '',
+        shipaddr1: '',
+        billaddr2: '',
+        shipaddr2: '',
+        tin: '',
+        billcity: '',
+        shipcity: '',
+        area: '',
+        salesperson: '',
         phone: '',
         fax: '',
         email: '',
-        notes: ''
+        remarks: '',
+        acctstat: 1,
+        gender: 1,
+        civilstat: 1,
+        proftype: 1,
+        profgroup: 1,
+        clientgroupid: 1,
+        pricecodeid: 1,
+        hasbranches: false,
       },
       headers: [
         {
           text: 'Address ID',
           align: 'start',
-          value: 'address_id',
+          value: 'accountname',
         },
       ],
       addressIDRules: [
@@ -187,7 +261,11 @@ export default {
   watch: {
     profileListWatch(newval, oldval) {
       console.log('list updated');
-    }
+    },
+
+    menu (val) {
+      val && setTimeout(() => (this.activePicker = 'YEAR'))
+    },
   },
   async created() {
     console.log('Profiles Component Created')
@@ -201,21 +279,48 @@ export default {
   },
   methods: {
     ...mapMutations(['incrementCounter','closeProfile', 'mutateZindex']),
+
+    saveDate (date) {
+      this.$refs.menu.save(date)
+    },
+
     handleInput (e) {
       this.$emit('input', this.content)
     },
     clearprofile() {
-      this.profileinfo.id = ''
-      this.profileinfo.address_id = ''
-      this.profileinfo.name = ''
-      this.profileinfo.address = ''
-      this.profileinfo.address_2 = ''
-      this.profileinfo.type = ''
-      this.profileinfo.city = ''
-      this.profileinfo.phone = ''
-      this.profileinfo.fax = ''
-      this.profileinfo.email = ''
-      this.profileinfo.notes = ''
+      this.profileinfo.id = '';
+      this.profileinfo._id = '';
+      this.profileinfo.previd = '';
+      this.profileinfo.accountname = '';
+      this.profileinfo.fname = '';
+      this.profileinfo.lname = '';
+      this.profileinfo.mname = '';
+      this.profileinfo.bday = '';
+      this.profileinfo.address = '';
+      this.profileinfo.address_2 = '';
+      this.profileinfo.createdBy = '';
+      this.profileinfo.editedBy = '';
+      this.profileinfo.billaddr1 = '';
+      this.profileinfo.shipaddr1 = '';
+      this.profileinfo.billaddr2 = '';
+      this.profileinfo.shipaddr2 = '';
+      this.profileinfo.tin = '';
+      this.profileinfo.billcity = '';
+      this.profileinfo.shipcity = '';
+      this.profileinfo.area = '';
+      this.profileinfo.salesperson = '';
+      this.profileinfo.phone = '';
+      this.profileinfo.fax = '';
+      this.profileinfo.email = '';
+      this.profileinfo.remarks = '';
+      this.profileinfo.acctstat = '';
+      this.profileinfo.gender = '';
+      this.profileinfo.civilstat = '';
+      this.profileinfo.proftype = '';
+      this.profileinfo.profgroup = '';
+      this.profileinfo.clientgroupid = '';
+      this.profileinfo.pricecodeid = '';
+      this.profileinfo.hasbranches = '';
     },
     createnew() {
       this.creating = true;
@@ -229,7 +334,7 @@ export default {
         this.valid = this.$refs.form.validate()
         if(this.valid){
           try{
-            let res = await this.callApi('post', '/updateprofile', this.profileinfo)
+            let res = await this.callApi('PATCH', '/profiles', this.profileinfo)
             console.log(res)
             if(res){
               this.tellParentToUpdate()
@@ -295,18 +400,39 @@ export default {
     this.creating = false;
     //specified this one by one so that it will not copy the reactive properties
     //this will throw an error when its - this.profileinfo = value
-		this.profileinfo.id = value.id
-		this.profileinfo.address_id = value.address_id
-		this.profileinfo.name = value.name
-		this.profileinfo.address = value.address
-		this.profileinfo.address_2 = value.address_2
-		this.profileinfo.type = value.type
-		this.profileinfo.city = value.city
-		this.profileinfo.phone = value.phone
-		this.profileinfo.fax = value.fax
-		this.profileinfo.email = value.email
-    this.profileinfo.notes = value.notes
-    // console.log(this.profileinfo);
+    this.profileinfo._id = value._id;
+    this.profileinfo.previd = value.previd;
+    this.profileinfo.accountname = value.accountname;
+    this.profileinfo.fname = value.fname;
+    this.profileinfo.lname = value.lname;
+    this.profileinfo.mname = value.mname;
+    this.profileinfo.bday = value.bday;
+    this.profileinfo.address = value.address;
+    this.profileinfo.address_2 = value.address_2;
+    this.profileinfo.createdBy = value.createdBy;
+    this.profileinfo.editedBy = value.editedBy;
+    this.profileinfo.billaddr1 = value.billaddr1;
+    this.profileinfo.shipaddr1 = value.shipaddr1;
+    this.profileinfo.billaddr2 = value.billaddr2;
+    this.profileinfo.shipaddr2 = value.shipaddr2;
+    this.profileinfo.tin = value.tin;
+    this.profileinfo.billcity = value.billcity;
+    this.profileinfo.shipcity = value.shipcity;
+    this.profileinfo.area = value.area;
+    this.profileinfo.salesperson = value.salesperson;
+    this.profileinfo.phone = value.phone;
+    this.profileinfo.fax = value.fax;
+    this.profileinfo.email = value.email;
+    this.profileinfo.remarks = value.remarks;
+    this.profileinfo.acctstat = value.acctstat;
+    this.profileinfo.gender = value.gender;
+    this.profileinfo.civilstat = value.civilstat;
+    this.profileinfo.proftype = value.proftype;
+    this.profileinfo.profgroup = value.profgroup;
+    this.profileinfo.clientgroupid = value.clientgroupid;
+    this.profileinfo.pricecodeid = value.pricecodeid;
+    this.profileinfo.hasbranches = value.hasbranches;
+    console.log(this.profileinfo);
 	},
   leftinput(e){
     console.log(e);
@@ -352,27 +478,4 @@ export default {
 
 <style>
 
-.compact-form {
-    transform: scale(0.875);
-    transform-origin: left;
-}
-
-.smallers{
-  font-size: 14px;
-}
-.custom-highlight-row{
-  background-color: pink
-}
-#draggable-container-profile {
-  position: absolute;
-  z-index: 9;
-  width: 900px;
-}
-#draggable-header-profile {
-  z-index: 10;
-  padding-left: 10px;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  background-color: #39465e;
-}
 </style>

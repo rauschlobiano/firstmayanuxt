@@ -1,7 +1,7 @@
 <template>
 <v-app>
     <v-app-bar app color="deep-purple" dense dark fixed>
-      <v-toolbar-title>TradeTech 2.1</v-toolbar-title>
+      <v-toolbar-title>RiverMayaJS</v-toolbar-title>
       <h1 class="mx-4" style="color: gray">|</h1>
       <v-btn @click="clickProfile" icon>
         <v-icon>mdi-account-group</v-icon>
@@ -65,7 +65,8 @@ export default {
   methods: {
     ...mapMutations(['incrementCounter','closeProfile', 'updateProfileList','updateProfileArray',
         'updateProfileTypeList', 'updateItemList', 'updateVendorList', 'updateItemArray',
-        'updateItemSize', 'updateItemSizePiece', 'updateItemPrice', 'updateItemPriceCode',
+        'updateItemSize', 'updateItemSizePiece', 'updateItemPrice', 'updatePriceCode',
+        'updateGenderList', 'updateAccountStatsList', 'updateProfGroupList'
       ]),
     clickProfile() {
       //this.$store.dispatch('actionShowHideProfile')
@@ -91,8 +92,9 @@ export default {
     //profiles
     async getallprofiles(state){
       console.log('getting all profiles')
-      let res = await this.callApi('get', '/allprofiles')
+      let res = await this.callApi('get', '/profiles')
       this.updateProfileList(res.data)
+
       //create the profiles array
       let profarray = []
       res.data.forEach(element => {
@@ -105,14 +107,13 @@ export default {
     async getallitems(state){
       console.log('getting all items')
       let res = await this.callApi('get', '/items')
-      //this.updateItemList(res.data)
-      console.log(res);
-       //create the profiles array
-      // let itemarray = []
-      // res.data.forEach(element => {
-      //   itemarray.push(element.itemdescrip)
-      // });
-      // this.updateItemArray(itemarray)
+      this.updateItemList(res.data)
+
+      let itemarray = []
+      res.data.forEach(element => {
+        itemarray.push(element.itemdescrip)
+      });
+      this.updateItemArray(itemarray)
     },
     async getallitemsizes(state){
       console.log('getting all item sizes')
@@ -129,28 +130,40 @@ export default {
       let res = await this.callApi('get', '/allitemprices')
       this.updateItemPrice(res.data)
     },
-    async getallitempricecodes(state){
-      console.log('getting all item price codes')
-      let res = await this.callApi('get', '/allitempricecodes')
-      this.updateItemPriceCode(res.data)
-    },
+
     //vendors
     async getallvendors(state){
       console.log('getting all vendors')
-      let res = await this.callApi('get', '/allvendors')
+      let res = await this.callApi('get', '/profiles/suppliers')
       this.updateVendorList(res.data)
     },
-    //profile types
+
+
+    //taggings
     async getallprofilestypes(state){
-      console.log('getting all profile types')
-      let res = await this.callApi('get', '/profiletypes')
-      let newarray = []
-      res.data.forEach(function (arrayItem) {
-          newarray.push(arrayItem.typedescrip)
-      });
-
-      this.updateProfileTypeList(newarray)
-
+      console.log('getting all profile types');
+      let res = await this.callApi('get', '/taggings/proftypes');
+      this.updateProfileTypeList(res.data);
+    },
+    async getallgenders(state){
+      console.log('getting all genders')
+      let res = await this.callApi('get', '/taggings/genders')
+      this.updateGenderList(res.data)
+    },
+    async getallaccountstats(state){
+      console.log('getting all account stats')
+      let res = await this.callApi('get', '/taggings/accountstats')
+      this.updateAccountStatsList(res.data)
+    },
+    async getallprofgroups(state){
+      console.log('getting all account stats')
+      let res = await this.callApi('get', '/taggings/profgroups')
+      this.updateProfGroupList(res.data)
+    },
+    async getallpricecodes(state){
+      console.log('getting all price codes')
+      let res = await this.callApi('get', '/taggings/pricecodes')
+      this.updatePriceCode(res.data)
     },
 
   },
@@ -162,16 +175,21 @@ export default {
   },
 
   async created() {
-    //this.getallprofiles()
+    this.getallprofiles();
+    this.getallvendors();
+    this.getallgenders();
+    this.getallaccountstats();
+    this.getallprofilestypes();
+    this.getallprofgroups();
+    this.getallpricecodes()
 
-    this.getallitems()
+    this.getallitems();
     // this.getallitemsizes()
     // this.getallitemsizepieces()
     // this.getallitemprices()
-    // this.getallitempricecodes()
 
-    // this.getallvendors()
-    // this.getallprofilestypes()
+
+
   }
 
 }
