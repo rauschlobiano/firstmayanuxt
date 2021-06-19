@@ -21,11 +21,11 @@
             </div>
 
               <v-container>
-              <v-row>
+              <v-row dense>
                 <v-col cols="12" md="4">
-                  <v-text-field dense v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details></v-text-field>
-                  <v-data-table dense height="500px" :headers="headers" :items="this.$store.state.profileslistdata" item-key="_id "
-					          :items-per-page="12" class="elevation-1 my-0" :search="search">
+                  <v-text-field  v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details></v-text-field>
+                  <v-data-table height="500px" :headers="headers" :items="this.$store.state.profileslistdata" item-key="_id "
+					          :items-per-page="15" class="elevation-1 my-0" :search="search">
                     <template v-slot:body="{ items }">
                       <tbody>
                       <tr v-for="item in items" :key="item._id" @click="rowClicked(item)" :class="{'selectedRow': item._id == profileinfo._id}">
@@ -39,7 +39,7 @@
                 <v-col cols="12" md="8">
                   <v-form v-model="valid" ref="form" lazy-validation >
                     <v-container>
-                      <v-row>
+                      <v-row dense>
                         <v-spacer></v-spacer>
                         <v-btn x-small light fab color="primary" @click="createnew" v-if="!creating" depressed class="mr-2">
                           <v-icon>mdi-plus</v-icon>
@@ -49,7 +49,7 @@
                         </v-btn>
                       </v-row>
 
-                      <v-row>
+                      <v-row dense>
                         <v-col cols="9">
                           <v-text-field dense v-model="profileinfo.accountname" :counter="70"
                           label="Full Name" @change="profchange" :rules="nameRules"></v-text-field>
@@ -60,7 +60,7 @@
                         </v-col>
                       </v-row>
 
-                      <v-row>
+                      <v-row dense>
                         <v-col cols="4">
                           <v-text-field dense v-model="profileinfo.fname" label="First" @change="profchange" :counter="30"></v-text-field>
                         </v-col>
@@ -72,10 +72,10 @@
                         </v-col>
                       </v-row>
 
-                      <v-row>
+                      <v-row dense>
                         <v-col cols="12" md="4" >
                           <v-select dense :items="this.$store.state.accountstats" label="Account Status"
-                          v-model="profileinfo.accountstat" @change="profchange"  item-value="accountstatid"
+                          v-model="profileinfo.acctstat" @change="profchange"  item-value="accountstatid"
                           item-text="accountstatdescrip"></v-select>
                         </v-col>
                         <v-col cols="12" md="4" >
@@ -90,42 +90,20 @@
                         </v-col>
                       </v-row>
 
-                      <v-row>
-                        <v-col cols="12" md="4" >
+                      <v-row dense>
+                        <v-col cols="4" >
                           <v-text-field dense v-model="profileinfo.email" label="E-mail" @change="profchange"></v-text-field>
                         </v-col>
-                        <v-col cols="12" md="4" >
-                          <v-select dense :items="this.$store.state.genders" label="Gender"
-                          v-model="profileinfo.gender" @change="profchange" item-value="genderid"
-                          item-text="genderdescrip"></v-select>
-                        </v-col>
-                        <v-col cols="12" md="4" >
-                          <v-menu ref="menu" v-model="menu" :close-on-content-click="false" transition="scale-transition"
-                            offset-y min-width="auto" >
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-text-field dense v-model="profileinfo.bday"
-                                label="Date of Birth" prepend-icon="mdi-calendar" readonly v-bind="attrs"
-                                v-on="on" ></v-text-field>
-                            </template>
-                            <v-date-picker dense v-model="profileinfo.bday" :active-picker.sync="activePicker"
-                              :max="new Date().toISOString().substr(0, 10)" min="1950-01-01" @change="saveDate" ></v-date-picker>
-                          </v-menu>
-                        </v-col>
-                      </v-row>
-
-                      <v-row>
-
-                      </v-row>
-
-                      <v-row>
-                        <v-col cols="12" md="6" >
+                        <v-col cols="4" >
                           <v-text-field dense v-model="profileinfo.phone" label="Phone" @change="profchange"></v-text-field>
                         </v-col>
-                        <v-col cols="12" md="6" >
+                        <v-col cols="4" >
                           <v-text-field dense v-model="profileinfo.fax" label="Fax" @change="profchange"></v-text-field>
                         </v-col>
                       </v-row>
-                      <v-row>
+
+
+                      <v-row dense>
                         <v-col cols="12" md="6" >
                           <v-text-field dense v-model="profileinfo.address" label="Address 1" @change="profchange"></v-text-field>
                         </v-col>
@@ -133,7 +111,7 @@
                           <v-text-field dense v-model="profileinfo.address_2" label="Address 2" @change="profchange"></v-text-field>
                         </v-col>
                       </v-row>
-                      <v-row>
+                      <v-row dense>
                         <v-col cols="12" md="3" >
                           <v-text-field dense v-model="profileinfo.city" label="City" @change="profchange"></v-text-field>
                         </v-col>
@@ -147,6 +125,33 @@
                           <v-text-field dense v-model="profileinfo.country" label="Country" @change="profchange"></v-text-field>
                         </v-col>
                       </v-row>
+
+                      <v-row dense>
+                        <v-col cols="12" md="4" >
+                          <v-select dense :items="this.$store.state.genders" label="Gender"
+                          v-model="profileinfo.gender" @change="profchange" item-value="genderid"
+                          item-text="genderdescrip"></v-select>
+                        </v-col>
+                        <v-col cols="12" md="4" >
+                          <v-select dense :items="this.$store.state.genders" label="Gender"
+                          v-model="profileinfo.gender" @change="profchange" item-value="genderid"
+                          item-text="genderdescrip"></v-select>
+                        </v-col>
+                        <v-spacer></v-spacer>
+                        <v-col cols="12" md="4" >
+                          <v-menu ref="menu" v-model="menu" :close-on-content-click="false" transition="scale-transition"
+                            offset-y min-width="auto" >
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-text-field v-model="bdaydisplay"
+                                label="Date of Birth" prepend-icon="mdi-calendar" readonly v-bind="attrs"
+                                v-on="on" ></v-text-field>
+                            </template>
+                            <v-date-picker dense v-model="bdaydisplay" :active-picker.sync="activePicker"
+                              :max="new Date().toISOString().substr(0, 10)" min="1950-01-01" @change="saveDate" ></v-date-picker>
+                          </v-menu>
+                        </v-col>
+                      </v-row>
+
                       <v-row class="my-3">
                         <v-col>
                           <v-textarea solo v-model="profileinfo.notes" name="input-7-4" label="Notes" @change="profchange"></v-textarea>
@@ -178,7 +183,8 @@
 </template>
 
 <script>
-import {mapState, mapMutations} from 'vuex'
+import {mapState, mapMutations} from 'vuex';
+import moment from 'moment';
 
 export default {
   name: 'ProfileComponent',
@@ -189,10 +195,9 @@ export default {
 
       activePicker: null,
       menu: false,
-
+      bdaydisplay: '',
       search: '',
       valid: false,
-      sampletype: ['test1','test2'],
       creating: true,
       snackbar: false,
       snackbartext: '',
@@ -221,7 +226,7 @@ export default {
         fax: '',
         email: '',
         remarks: '',
-        acctstat: 1,
+        acctstat: 0,
         gender: 1,
         civilstat: 1,
         proftype: 1,
@@ -263,12 +268,20 @@ export default {
       console.log('list updated');
     },
 
+    bdaydisplay(val){
+      console.log(val);
+    },
+
+    showprofileflag(){
+      //always on top
+
+    },
+
     menu (val) {
       val && setTimeout(() => (this.activePicker = 'YEAR'))
     },
   },
   async created() {
-    console.log('Profiles Component Created')
 
   },
   computed: {
@@ -295,7 +308,6 @@ export default {
       this.profileinfo.fname = '';
       this.profileinfo.lname = '';
       this.profileinfo.mname = '';
-      this.profileinfo.bday = '';
       this.profileinfo.address = '';
       this.profileinfo.address_2 = '';
       this.profileinfo.createdBy = '';
@@ -313,20 +325,34 @@ export default {
       this.profileinfo.fax = '';
       this.profileinfo.email = '';
       this.profileinfo.remarks = '';
-      this.profileinfo.acctstat = '';
-      this.profileinfo.gender = '';
-      this.profileinfo.civilstat = '';
-      this.profileinfo.proftype = '';
-      this.profileinfo.profgroup = '';
-      this.profileinfo.clientgroupid = '';
-      this.profileinfo.pricecodeid = '';
-      this.profileinfo.hasbranches = '';
+      this.profileinfo.bday = null;
+      this.bdaydisplay = null;
+      this.profileinfo.acctstat = null;
+      this.profileinfo.gender = null;
+      this.profileinfo.civilstat = null;
+      this.profileinfo.proftype = null;
+      this.profileinfo.profgroup = null;
+      this.profileinfo.clientgroupid = null;
+      this.profileinfo.pricecodeid = null;
+      this.profileinfo.hasbranches = null;
     },
     createnew() {
       this.creating = true;
-      this.clearprofile
-      this.$refs.form.reset()
-      this.$refs.form.resetValidation()
+      this.clearprofile;
+      this.setdefaults();
+      this.$refs.form.reset();
+      this.$refs.form.resetValidation();
+    },
+
+    setdefaults() {
+      this.profileinfo.acctstat = 1;
+      this.profileinfo.gender = 1;
+      this.profileinfo.civilstat = 1;
+      this.profileinfo.proftype = 1;
+      this.profileinfo.profgroup = 1;
+      this.profileinfo.clientgroupid = 1;
+      this.profileinfo.pricecodeid = 1;
+      this.profileinfo.hasbranches = false;
     },
 
     async profchange(event){
@@ -334,7 +360,7 @@ export default {
         this.valid = this.$refs.form.validate()
         if(this.valid){
           try{
-            let res = await this.callApi('PATCH', '/profiles', this.profileinfo)
+            let res = await this.callApi('PATCH', '/profiles/'+this.profileinfo._id, this.profileinfo)
             console.log(res)
             if(res){
               this.tellParentToUpdate()
@@ -352,16 +378,16 @@ export default {
 
         if(this.valid){
           try{
-            let res = await this.callApi('post', '/createprofile', this.profileinfo)
+            let res = await this.callApi('POST', '/profiles', this.profileinfo)
             console.log(res)
             this.snackbar = true
-            if(res.data.created){
+            if(res.data){
               this.snackbartext = "Profile Created!"
               this.tellParentToUpdate()
               this.creating = false
             }
             else {
-              this.snackbartext = "Sorry, Profile Not Created (Address ID is taken)"
+              this.snackbartext = "Sorry, Profile Not Created"
             }
           }catch(ex){
             console.log(ex)
@@ -372,7 +398,7 @@ export default {
     async deleteprofile(){
       if(!this.creating) {
         try{
-          let res = await this.callApi('post', '/deleteprofile', this.profileinfo)
+          let res = await this.callApi('DELETE', '/profiles/' + this.profileinfo._id)
           console.log(res)
           if(res){
             this.snackbar = true
@@ -390,9 +416,7 @@ export default {
     if(this.showprofileflag){
       document.getElementById('draggable-container-profile').style.zIndex = this.$store.state.lastzindex + 1;
       document.getElementById('draggable-header-profile').style.zIndex = this.$store.state.lastzindex + 2;
-      this.mutateZindex()
-      console.log(this.$store.state.lastzindex);
-
+      this.mutateZindex();
     }
   },
 
@@ -432,6 +456,13 @@ export default {
     this.profileinfo.clientgroupid = value.clientgroupid;
     this.profileinfo.pricecodeid = value.pricecodeid;
     this.profileinfo.hasbranches = value.hasbranches;
+    if(this.profileinfo.bday){
+      let bday = this.profileinfo.bday;
+      this.bdaydisplay = moment(bday.substring(0,10)).format('MMM DD YYYY')
+    }
+    else{
+      this.bdaydisplay = null;
+    }
     console.log(this.profileinfo);
 	},
   leftinput(e){

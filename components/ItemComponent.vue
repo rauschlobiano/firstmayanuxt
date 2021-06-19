@@ -21,7 +21,7 @@
 
         <v-container>
           <v-row>
-            <v-col cols="12" md="5">
+            <v-col cols="5">
               <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details></v-text-field>
 
               <v-data-table height="500px" :headers="headers" :items="this.$store.state.itemslistdata" item-key="iteminfoid"
@@ -36,73 +36,130 @@
                 </template>
               </v-data-table>
             </v-col>
-            <v-col cols="12" md="7">
-                  <v-row>
-                    <v-col cols="12" md="3">
-                      Item Details
-                    </v-col>
-                    <v-spacer></v-spacer>
-                    <v-col cols="12" md=4>
-                      <div class="text-right">
-                        <v-btn class="mr-1" x-small light fab color="primary" @click="createnew"
-                        v-if="!creating" depressed>
-                          <v-icon>mdi-plus</v-icon>
-                        </v-btn>
-                        <v-btn x-small light fab color="error" @click="showdialog = true" v-if="!creating" depressed>
-                          <v-icon>mdi-minus</v-icon>
-                        </v-btn>
-
-                      </div>
-                    </v-col>
-                  </v-row>
-
-                  <v-row class="mt-2">
-                    <v-col cols="12">
-                      <v-form v-model="valid" ref="form" lazy-validation >
-                        <v-container>
-
-                          <v-row dense>
-                            <v-col cols="12" md="4">
-                              <v-text-field v-model="iteminfo.itemcode" :rules="inputRules"
-                              :counter="20" label="Code" @change="changetrigger">
-                              </v-text-field>
-                            </v-col>
-                            <v-col cols="12" md="8">
-                              <v-text-field v-model="iteminfo.itemdescrip" :counter="80"  :rules="inputRules"
-                              label="Description" @change="changetrigger">
-                              </v-text-field>
-                            </v-col>
-                          </v-row>
-                          <v-row dense>
-                            <v-col cols="12">
-                              <v-select v-model="iteminfo.supplierprofid" dense :rules="inputRules"
-                              :items="this.$store.state.vendorslistdata" label="Supplier" item-text="accountname"
-                                item-value="_id" @change="changetrigger" >
-                                </v-select>
-                            </v-col>
-                          </v-row>
-                          <v-row dense v-if="!creating">
-                              <v-col cols="12" md="6">
-                                <v-text-field v-model="iteminfo.editedBy" label="Edited by" readonly>
-
-                                </v-text-field>
-                              </v-col>
-                              <v-col cols="12" md="6">
-                                <v-text-field v-model="iteminfo.updatedAt" label="Edited on" readonly>
-
-                                </v-text-field>
-                              </v-col>
-                          </v-row>
-                        </v-container>
-                      </v-form>
-                    </v-col>
-
-
-                    <v-btn color="success" small @click="saveitem" v-if="creating" :disabled="!valid" depressed bottom right absolute>
-                      <v-icon small>mdi-content-save-all</v-icon> Save
+            <v-col cols="7">
+              <v-row>
+                <v-col cols="3">
+                  Item Details
+                </v-col>
+                <v-spacer></v-spacer>
+                <v-col cols="12" md=4>
+                  <div class="text-right">
+                    <v-btn class="mr-1" x-small light fab color="primary" @click="createnew"
+                    v-if="!creating" depressed>
+                      <v-icon>mdi-plus</v-icon>
                     </v-btn>
+                    <v-btn x-small light fab color="error" @click="showdialog = true" v-if="!creating" depressed>
+                      <v-icon>mdi-minus</v-icon>
+                    </v-btn>
+                  </div>
+                </v-col>
+              </v-row>
 
-                  </v-row>
+                <v-form v-model="valid" ref="form" lazy-validation class="mt-3">
+                  <v-container>
+                    <v-row dense>
+                      <v-col cols="6">
+                        <v-text-field dense v-model="iteminfo.itemcode" :rules="inputRules"
+                        :counter="20" label="Code" @change="changetrigger">
+                        </v-text-field>
+                      </v-col>
+                    </v-row>
+                    <v-row dense>
+                      <v-col cols="12">
+                        <v-text-field dense v-model="iteminfo.itemdescrip" :counter="80"  :rules="inputRules"
+                        label="Description" @change="changetrigger">
+                        </v-text-field>
+                      </v-col>
+                    </v-row>
+                    <v-row dense>
+                      <v-col cols="12">
+                        <v-select dense v-model="iteminfo.supplierprofid" :rules="inputRules"
+                        :items="this.$store.state.vendorslistdata" label="Supplier" item-text="accountname"
+                          item-value="_id" @change="changetrigger" >
+                          </v-select>
+                      </v-col>
+                    </v-row>
+
+                  </v-container>
+                </v-form>
+
+                <v-row>
+                <v-tabs	v-model="tab" v-if="!creating">
+                  <v-tab	v-for="item in tabitems" :key="item.tab">
+                    {{ item.tab }}
+                  </v-tab>
+                </v-tabs>
+                <v-tabs-items v-model="tab">
+                  <!-- ITEM SIZE PIECE -->
+                  <v-tab-item>
+                    <v-card flat>
+                      <v-row>
+                        <v-col class="text-right">
+                          <v-btn class="mr-1" x-small light fab color="info"
+                            v-if="!creating" depressed>
+                            <v-icon>mdi-plus</v-icon>
+                          </v-btn>
+                        </v-col>
+                      </v-row>
+
+                      <v-data-table height="200px" :headers="headerssizepiece" :items="itemsizepiecelocal" item-key="_id"
+                        :items-per-page="15" class="elevation-1 my-2 mx-1">
+                        <template v-slot:body="{ items }">
+                        <tbody>
+                        <tr v-for="item in items" :key="item._id" @click="selectItemSizePiece(item)"
+                          :class="{'selectedRow': item._id == selecteditemsizepiece._id}">
+                          <td>{{ item.itemsize }}</td>
+                          <td>{{ item.pieces }}</td>
+                          <td>{{ item.action }}</td>
+                        </tr>
+                        </tbody>
+                        </template>
+                        <template v-slot:item.actions="{ item }">
+                          <v-icon
+                            small
+                            class="mr-2"
+                            @click="editItem(item)"
+                          >
+                            mdi-pencil
+                          </v-icon>
+                          <v-icon
+                            small
+                            @click="deleteItem(item)"
+                          >
+                            mdi-delete
+                          </v-icon>
+                        </template>
+                      </v-data-table>
+                    </v-card>
+                  </v-tab-item>
+                  <!-- ITEM PRICING -->
+                  <v-tab-item>
+                    <v-card flat>
+                      <v-data-table height="200px" :headers="headersprice" :items="itempricelocal" item-key="_id"
+                        :items-per-page="15" class="elevation-1 my-0">
+                        <template v-slot:body="{ items }">
+                        <tbody>
+                        <tr v-for="item in items" :key="item._id" @click="selectItemPrice(item)"
+                          :class="{'selectedRow': item._id == selecteditemprice._id}">
+                          <td>{{ item.pricecode }}</td>
+                          <td>{{ dollarformat(item.price) }}</td>
+                        </tr>
+                        </tbody>
+                        </template>
+                      </v-data-table>
+                    </v-card>
+                  </v-tab-item>
+                </v-tabs-items>
+              </v-row>
+
+              <v-btn color="success" small @click="saveitem" v-if="creating" :disabled="!valid" depressed bottom right absolute>
+                <v-icon small>mdi-content-save-all</v-icon> Save
+              </v-btn>
+
+              <v-row dense v-if="!creating" class="font-weight-light mt-4">
+                <v-spacer></v-spacer>
+                Last Updated by <span class="font-weight-bold mx-1"> {{iteminfo.editedBy}}</span> on {{iteminfo.updatedAt}}
+              </v-row>
 
             </v-col>
           </v-row>
@@ -161,7 +218,16 @@ export default {
       snackbar: false,
       snackbartext: '',
       creating: true,
-      proceedtodelete: false,
+      tabitems: [
+		  { tab: 'Size/Piece' },
+          { tab: 'Pricing' }
+		],
+      tab: null,
+	  itemsizepiecelocal: [],
+	  itempricelocal: [],
+    proceedtodelete: false,
+	  selecteditemsizepiece: {},
+	  selecteditemprice: {},
       iteminfo: {
         iteminfoid: '',
         itemcode: '',
@@ -176,15 +242,25 @@ export default {
       ],
       search: '',
       headers: [
-        // {
-        //   text: 'Code',
-        //   align: 'center',
-        //   value: 'itemcode',
-        // },
         {text: 'Description',
         align: 'start',
         value: 'itemdescrip'
         }
+      ],
+      headerssizepiece: [
+        {text: 'Size', align: 'start', value: 'itemsize', width: "50%"},
+        {text: 'Pieces', align: 'start', value: 'pieces', width: "30%" },
+        {text: 'Actions', align: 'start', value: 'actions', width: "20%"},
+      ],
+      headersprice: [
+        {text: 'Price Code',
+        align: 'start',
+        value: 'pricecode'
+        },
+        {text: 'Price',
+        align: 'start',
+        value: 'price'
+        },
       ],
       positions: {
         clientX: undefined,
@@ -194,20 +270,28 @@ export default {
       }
     }
   },
-  watch: {
 
-  },
-  async created() {
-
-  },
-  computed: {
-
-  },
-  watch: {
-
-  },
   methods: {
     ...mapMutations(['incrementCounter','closeProfile', 'mutateZindex']),
+
+	async getSizePiece(){
+		try{
+            let res = await this.callApi('GET', '/itemsizepieces/'+this.iteminfo._id)
+			this.itemsizepiecelocal = res.data;
+
+		}catch(ex){
+		console.log(ex)
+		}
+	},
+	async getPrices(){
+		try{
+            let res = await this.callApi('GET', '/itemprices/'+this.iteminfo._id)
+			this.itempricelocal = res.data;
+
+		}catch(ex){
+		console.log(ex)
+		}
+	},
 
     async saveitem(){
       if(this.creating){
@@ -274,7 +358,11 @@ export default {
       this.$emit('reupdateitemlist')
     },
 
-	  selectItem (item) {
+  dollarformat(amt){
+    return new Intl.NumberFormat('en', { currency: 'USD', style: 'currency',}).format(amt)
+  },
+
+	selectItem (item) {
       this.iteminfo._id= item._id
       this.iteminfo.itemcode = item.itemcode
       this.iteminfo.itemdescrip = item.itemdescrip
@@ -283,7 +371,21 @@ export default {
       this.iteminfo.editedBy = item.editedBy
 
       this.creating = false
+
+	  //get the item size pieces
+	  this.getSizePiece();
+	  //get the prices
+	  this.getPrices();
     },
+
+	selectItemSizePiece(item){
+		this.selecteditemsizepiece = item;
+		console.log(item);
+	},
+	selectItemPrice(item){
+		this.selecteditemprice = item;
+		console.log(item);
+	},
 
     createnew(){
       this.creating = true
@@ -342,32 +444,21 @@ export default {
       document.onmouseup = null
       document.onmousemove = null
     }
-  }
+  },
+   watch: {
+
+  },
+  async created() {
+
+  },
+  computed: {
+
+  },
+
 }
 
 </script>
 
 <style>
-.selectedRow {
-    background-color: rgb(228, 234, 236);
-}
 
-.smallboy {
-  font-size: 14px;
-}
-
-
-#draggable-container-item {
-  position: absolute;
-  z-index: 9;
-  width: 600px;
-}
-#draggable-header-item {
-  z-index: 10;
-  padding-left: 10px;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  background-color: seagreen;
-
-}
 </style>

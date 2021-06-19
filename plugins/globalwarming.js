@@ -1,9 +1,9 @@
 import Vue from 'vue';
 
-import Vuetify from 'vuetify';
-import 'vuetify/dist/vuetify.min.css';
+// import Vuetify from 'vuetify';
+// import 'vuetify/dist/vuetify.min.css';
 
-Vue.use(Vuetify);
+// Vue.use(Vuetify);
 
 
 //the methods here will be used throughout the app
@@ -20,6 +20,10 @@ Vue.mixin({
           url: url,
           data: dataBody,
         })
+        .catch(e => {
+          return false;
+        })
+
         return data;
       }
       catch(e) {

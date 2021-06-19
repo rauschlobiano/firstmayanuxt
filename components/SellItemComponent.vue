@@ -585,7 +585,7 @@ export default {
   }, //end of methods
 
   async created() {
-	  console.log('SellItem created..');
+
   },
   computed: {
 

@@ -1,7 +1,7 @@
 <template>
 <v-app>
     <v-app-bar app color="deep-purple" dense dark fixed>
-      <v-toolbar-title>RiverMayaJS</v-toolbar-title>
+      <v-toolbar-title>Valhalla Goods Inc.</v-toolbar-title>
       <h1 class="mx-4" style="color: gray">|</h1>
       <v-btn @click="clickProfile" icon>
         <v-icon>mdi-account-group</v-icon>
@@ -17,27 +17,37 @@
 
     </v-app-bar>
     <v-main>
+    <v-row>
+      <!-- adding data-app to prevent error in v-select element -->
+      <div data-app>
+      <ProfileComponent :showprofileflag="showhideprof" @profileformclose="closeFromProfile" @reupdateproflist="getallprofiles">
+      </ProfileComponent>
+      </div>
 
-      <v-row>
-        <!-- adding data-app to prevent error in v-select element -->
-        <div data-app>
-        <ProfileComponent class="col-12" :showprofileflag="showhideprof" @profileformclose="closeFromProfile" @reupdateproflist="getallprofiles">
-        </ProfileComponent>
-        </div>
+      <div data-app>
+      <ItemComponent :showflag="showhideitem" @formclose="closeFromItem" @reupdateitemlist="getallitems">
+      </ItemComponent>
+      </div>
 
-        <div data-app>
-        <ItemComponent class="col-12" :showflag="showhideitem" @formclose="closeFromItem" @reupdateitemlist="getallitems">
-        </ItemComponent>
-        </div>
+      <div data-app>
+      <SellItemComponent :showflag="showhidesellitem"  @formclose="closeFromSellItem">
+      </SellItemComponent>
+      </div>
 
-        <div data-app>
-        <SellItemComponent class="col-12" :showflag="showhidesellitem"  @formclose="closeFromSellItem">
-        </SellItemComponent>
-        </div>
+      <v-card class="mx-auto mt-10" height="80" width="300" v-if="!connected">
+        <v-row class="my-auto">
+          <v-col class="text-center">
+              <h4 style="color: maroon">Not connected to server!</h4>
+          </v-col>
+        </v-row>
+        <v-row>
 
-      </v-row>
+        </v-row>
+      </v-card>
 
-    </v-main>
+    </v-row>
+</v-main>
+
 
   </v-app>
 </template>
@@ -59,18 +69,20 @@ export default {
       showhideprof: false,
       showhideitem: false,
       showhidesellitem: false,
+      connected: true,
     }
   },
 
   methods: {
-    ...mapMutations(['incrementCounter','closeProfile', 'updateProfileList','updateProfileArray',
+    ...mapMutations(['mutateZindex','closeProfile', 'updateProfileList','updateProfileArray',
         'updateProfileTypeList', 'updateItemList', 'updateVendorList', 'updateItemArray',
         'updateItemSize', 'updateItemSizePiece', 'updateItemPrice', 'updatePriceCode',
         'updateGenderList', 'updateAccountStatsList', 'updateProfGroupList'
       ]),
     clickProfile() {
       //this.$store.dispatch('actionShowHideProfile')
-      this.showhideprof = !this.showhideprof
+      this.showhideprof = !this.showhideprof;
+
     },
     clickItem() {
       //this.$store.dispatch('actionShowHideProfile')
@@ -117,17 +129,17 @@ export default {
     },
     async getallitemsizes(state){
       console.log('getting all item sizes')
-      let res = await this.callApi('get', '/allitemsizes')
+      let res = await this.callApi('GET', '/itemsizes')
       this.updateItemSize(res.data)
     },
     async getallitemsizepieces(state){
       console.log('getting all item size pieces')
-      let res = await this.callApi('get', '/allitemsizepieces')
+      let res = await this.callApi('GET', '/itemsizepieces')
       this.updateItemSizePiece(res.data)
     },
     async getallitemprices(state){
       console.log('getting all item prices')
-      let res = await this.callApi('get', '/allitemprices')
+      let res = await this.callApi('GET', '/itemprices')
       this.updateItemPrice(res.data)
     },
 
@@ -165,6 +177,30 @@ export default {
       let res = await this.callApi('get', '/taggings/pricecodes')
       this.updatePriceCode(res.data)
     },
+    async firstcheck(){
+      try{
+        console.log('Trying to connect to API....');
+        let res = await this.callApi('GET', '/firstcheck');
+        if(res.data){
+          this.connected = true;
+        }
+        else {
+          this.connected = false;
+          console.log('API Connection attempt failed!');
+        }
+        console.log('Connected? : ' + this.connected);
+      }catch(ex){
+        this.connected = false;
+      }
+    },
+    async retryconnection(){
+      if(!this.connected){
+        let timeleft = 5;
+        setInterval(() => {
+
+        }, 1000);
+      }
+    }
 
   },
   //this displays on the server side
@@ -175,21 +211,24 @@ export default {
   },
 
   async created() {
-    this.getallprofiles();
-    this.getallvendors();
-    this.getallgenders();
-    this.getallaccountstats();
-    this.getallprofilestypes();
-    this.getallprofgroups();
-    this.getallpricecodes()
+    await this.firstcheck();
+    //checking if we have connection to the API
+    if(this.connected == true){
+      console.log('connected to API');
+      this.getallprofiles();
+      this.getallvendors();
+      this.getallgenders();
+      this.getallaccountstats();
+      this.getallprofilestypes();
+      this.getallprofgroups();
+      this.getallpricecodes()
 
-    this.getallitems();
-    // this.getallitemsizes()
-    // this.getallitemsizepieces()
-    // this.getallitemprices()
+      this.getallitems();
+      this.getallitemsizes()
 
-
-
+      // // this.getallitemsizepieces()
+      // // this.getallitemprices()
+    }
   }
 
 }
@@ -197,5 +236,6 @@ export default {
 
 
 <style>
+
 
 </style>
