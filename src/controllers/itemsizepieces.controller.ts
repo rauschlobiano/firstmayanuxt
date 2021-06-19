@@ -7,6 +7,11 @@ import { ItemsizepiecesServices } from "../services/itemsizepieces.service";
 export class ItemsizepiecesController {
   constructor(private services: ItemsizepiecesServices) {}
 
+  @Get("/:item_id")
+  async getItemSizePiece({ params }: MayaJsContext): Promise<any> {
+    return await this.services.getItemSizePiece(params);
+  }
+
   @Post()
   async createItemsizepieces({ body }: MayaJsContext): Promise<any> {
     // Create a Itemsizepieces

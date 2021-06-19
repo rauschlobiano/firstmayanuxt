@@ -10,6 +10,11 @@ export class AppController {
     return { message: "From AppController POST route", body };
   }
 
+  @Get("/firstcheck")
+  async firstcheck() {
+    return true;
+  }
+
   @Get()
   async readApp(): Promise<any> {
     // Read all App list

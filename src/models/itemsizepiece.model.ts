@@ -4,13 +4,18 @@ export default {
   name: "ItemSizePiece",
   schema: new Schema(
     {
-      name: {
+      item_id: {
         type: String,
-        required: [true, "Name is required."],
+        required: [true, "Item ID is required."],
       },
-      price: {
+      itemsizeid: {
         type: Number,
-        required: [true, "Price is required."],
+        required: [true, "Item Size ID is required."],
+      },
+
+      pieces: {
+        type: Number,
+        required: [true, "Pieces is required."],
       },
       createdBy: {
         type: String,

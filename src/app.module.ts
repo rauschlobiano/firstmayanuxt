@@ -8,10 +8,16 @@ import { mongoOptions } from "./datatabase/mongo";
 import { ProfilesController } from "./controllers/profiles.controller";
 import { ItemsController } from "./controllers/items.controller";
 import { TaggingsController } from "./controllers/taggings.controller";
+import { ItemsizesController } from "./controllers/itemsizes.controller";
+import { ItemsizepiecesServices } from "./services/itemsizepieces.service";
 //services
 import { ProfilesServices } from "./services/profiles.service";
 import { ItemsServices } from "./services/items.service";
 import { TaggingsServices } from "./services/taggings.service";
+import { ItemsizesServices } from "./services/itemsizes.service";
+import { ItemsizepiecesController } from "./controllers/itemsizepieces.controller";
+import { ItempricesController } from "./controllers/itemprices.controller";
+import { ItempricesServices } from "./services/itemprices.service";
 
 @Module({
   declarations: [
@@ -19,6 +25,9 @@ import { TaggingsServices } from "./services/taggings.service";
     ProfilesController,
     ItemsController,
     TaggingsController,
+    ItemsizesController,
+    ItemsizepiecesController,
+    ItempricesController,
   ],
   imports: [RouterModule.forRoot(routes), MongoDbModule.forRoot(mongoOptions)],
   providers: [
@@ -26,6 +35,9 @@ import { TaggingsServices } from "./services/taggings.service";
     ProfilesServices,
     ItemsServices,
     TaggingsServices,
+    ItemsizesServices,
+    ItemsizepiecesServices,
+    ItempricesServices,
   ],
   bootstrap: AppController,
 })

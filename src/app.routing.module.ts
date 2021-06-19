@@ -1,4 +1,7 @@
+import { ItempricesController } from "./controllers/itemprices.controller";
 import { ItemsController } from "./controllers/items.controller";
+import { ItemsizepiecesController } from "./controllers/itemsizepieces.controller";
+import { ItemsizesController } from "./controllers/itemsizes.controller";
 import { ProfilesController } from "./controllers/profiles.controller";
 import { TaggingsController } from "./controllers/taggings.controller";
 
@@ -14,5 +17,17 @@ export const routes = [
   {
     path: "taggings",
     controller: TaggingsController,
+  },
+  {
+    path: "itemsizes",
+    controller: ItemsizesController,
+  },
+  {
+    path: "itemsizepieces",
+    controller: ItemsizepiecesController,
+  },
+  {
+    path: "itemprices",
+    controller: ItempricesController,
   },
 ];

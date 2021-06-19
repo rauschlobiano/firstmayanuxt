@@ -4,9 +4,13 @@ export default {
   name: "ItemPrice",
   schema: new Schema(
     {
-      name: {
+      item_id: {
         type: String,
-        required: [true, "Name is required."],
+        required: [true, "Item ID is required."],
+      },
+      pricecode: {
+        type: String,
+        required: [true, "Price Code is required."],
       },
       price: {
         type: Number,

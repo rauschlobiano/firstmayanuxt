@@ -9,7 +9,6 @@ export class ProfilesController {
 
   @Get()
   async readItems(): Promise<any> {
-    //return this.testservices.testfunc();
     return this.services.getAll();
   }
 
@@ -27,7 +26,9 @@ export class ProfilesController {
   async createItems({ body }: MayaJsContext): Promise<any> {
     body.editedBy = "Me haha";
     body.createdBy = "Me haha";
-    return this.services.createNew(body);
+    delete body._id;
+    let newlycreated = this.services.createNew(body);
+    return { message: "success", data: newlycreated };
   }
 
   @Patch("/:_id")

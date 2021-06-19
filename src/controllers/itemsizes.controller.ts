@@ -7,16 +7,16 @@ import { ItemsizesServices } from "../services/itemsizes.service";
 export class ItemsizesController {
   constructor(private services: ItemsizesServices) {}
 
+  @Get()
+  async readItemsizes(): Promise<any> {
+    // Read all Itemsizes list
+    return await this.services.getAll();
+  }
+
   @Post()
   async createItemsizes({ body }: MayaJsContext): Promise<any> {
     // Create a Itemsizes
     return { message: "From ItemsizesController POST route", body };
-  }
-
-  @Get()
-  async readItemsizes(): Promise<any> {
-    // Read all Itemsizes list
-    return { message: "From ItemsizesController GET route" };
   }
 
   @Get("/:id")
