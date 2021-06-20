@@ -16,6 +16,10 @@ export default {
         type: String,
         required: [true, "Supplier is required."],
       },
+      active: {
+        type: Boolean,
+        required: [true, "Active is required."],
+      },
 
       createdBy: {
         type: String,

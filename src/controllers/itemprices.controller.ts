@@ -7,30 +7,31 @@ import { ItempricesServices } from "../services/itemprices.service";
 export class ItempricesController {
   constructor(private services: ItempricesServices) {}
 
-  @Get("/:item_id")
+  @Get("/specificprice/:item_id")
   async getItemSizePiece({ params }: MayaJsContext): Promise<any> {
-    return await this.services.getItemPrice(params);
+    return await this.services.getItemPriceByItemId(params);
   }
 
   @Post()
   async createItemprices({ body }: MayaJsContext): Promise<any> {
     // Create a Itemprices
-    return { message: "From ItempricesController POST route", body };
+    body.editedBy = "Manual Name";
+    body.createdBy = "Manual Name";
+    //remove the id
+    delete body._id;
+    return await this.services.createNewItemPrice(body);
   }
 
   @Get()
   async readItemprices(): Promise<any> {
     // Read all Itemprices list
-    return { message: "From ItempricesController GET route" };
+    return await this.services.getAllItemPrices();
   }
 
-  @Get("/:id")
+  @Get("/:_id")
   async readItempricesByID({ params }: MayaJsContext): Promise<any> {
     // Read Itemprices by ID from list
-    return {
-      message: "From ItempricesController GET route with params ID",
-      params,
-    };
+    return await this.services.getItemPriceByItemId(params);
   }
 
   @Put("/:id")
@@ -39,15 +40,15 @@ export class ItempricesController {
     return { message: "From ItempricesController PUT route", body, params };
   }
 
-  @Patch("/:id")
+  @Patch("/:_id")
   async updateItemprices({ body, params }: MayaJsContext): Promise<any> {
     // Update Itemprices from list
-    return { message: "From ItempricesController PATCH route", body, params };
+    return await this.services.updateItemPrice(body, params);
   }
 
-  @Delete("/:id")
+  @Delete("/:_id")
   async deleteItemprices({ params }: MayaJsContext): Promise<any> {
     // Delete Itemprices from list
-    return { message: "From ItempricesController DELETE route", params };
+    return await this.services.deleteItemPriceById(params);
   }
 }

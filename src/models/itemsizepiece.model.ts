@@ -8,9 +8,9 @@ export default {
         type: String,
         required: [true, "Item ID is required."],
       },
-      itemsizeid: {
-        type: Number,
-        required: [true, "Item Size ID is required."],
+      itemsize: {
+        type: String,
+        required: [true, "Item Size is required."],
       },
 
       pieces: {
