@@ -34,14 +34,16 @@
       </SellItemComponent>
       </div>
 
-      <v-card class="mx-auto mt-10" height="80" width="300" v-if="!connected">
+      <v-card class="mx-auto mt-10" height="120" width="300" v-if="!connected">
         <v-row class="my-auto">
           <v-col class="text-center">
-              <h4 style="color: maroon">Not connected to server!</h4>
+              <h3 style="color: maroon">Not connected to server!</h3>
+               <h4 class="mt-4"> Reloading in {{remainingtime}} </h4>
+               <v-container v-if="reconnecting">
+                <v-progress-circular indeterminate color="primary">
+                </v-progress-circular>
+               </v-container>
           </v-col>
-        </v-row>
-        <v-row>
-
         </v-row>
       </v-card>
 
@@ -70,6 +72,8 @@ export default {
       showhideitem: false,
       showhidesellitem: false,
       connected: true,
+      reconnecting: false,
+      remainingtime: 10,
     }
   },
 
@@ -80,9 +84,7 @@ export default {
         'updateGenderList', 'updateAccountStatsList', 'updateProfGroupList'
       ]),
     clickProfile() {
-      //this.$store.dispatch('actionShowHideProfile')
       this.showhideprof = !this.showhideprof;
-
     },
     clickItem() {
       //this.$store.dispatch('actionShowHideProfile')
@@ -180,13 +182,19 @@ export default {
     async firstcheck(){
       try{
         console.log('Trying to connect to API....');
+        this.reconnecting = true;
         let res = await this.callApi('GET', '/firstcheck');
+
         if(res.data){
+          console.log("Connected!");
           this.connected = true;
+          this.reconnecting= false;
         }
         else {
           this.connected = false;
           console.log('API Connection attempt failed!');
+          //start running the timer
+          this.retryconnection();
         }
         console.log('Connected? : ' + this.connected);
       }catch(ex){
@@ -194,11 +202,22 @@ export default {
       }
     },
     async retryconnection(){
-      if(!this.connected){
-        let timeleft = 5;
-        setInterval(() => {
+      var interval;
 
+      this.remainingtime = 10;
+      if(!this.connected){
+
+        interval = setInterval(() => {
+          this.remainingtime--;
+          console.log(this.remainingtime);
+          if(this.remainingtime == 0)
+          {
+            this.firstcheck();
+            clearInterval(interval);
+          }
         }, 1000);
+
+
       }
     }
 
@@ -209,12 +228,15 @@ export default {
     console.log('done loading');
 
   },
+  async getalldata(){
+    console.log(this.connected);
 
+  },
   async created() {
+    //checking connection to the API
     await this.firstcheck();
-    //checking if we have connection to the API
     if(this.connected == true){
-      console.log('connected to API');
+      console.log('Loading Store data...');
       this.getallprofiles();
       this.getallvendors();
       this.getallgenders();

@@ -4,15 +4,15 @@
       <v-card elevation="2" :min-width="900" v-if="showflag">
         <div id="draggable-header-item" @mousedown="dragMouseDown">
             <v-row>
-            <v-col cols="12" md="2">
+            <v-col cols="2">
               <span style="color: white; font-size: 12px">
                 Items
               </span>
             </v-col>
             <v-spacer>
             </v-spacer>
-            <v-col cols="12" md="1">
-              <v-btn x-small icon dark @click="tellParentToHideThis">
+            <v-col cols="1" class="text-right">
+              <v-btn x-small icon dark @click="tellParentToHideThis" class="mr-1">
                 <v-icon>mdi-power</v-icon>
               </v-btn>
             </v-col>
@@ -45,7 +45,7 @@
                 <v-col cols="12" md=4>
                   <div class="text-right">
                     <v-btn class="mr-1" x-small light fab color="primary" @click="createnew"
-                    v-if="!creating" depressed>
+                      v-if="!creating" depressed>
                       <v-icon>mdi-plus</v-icon>
                     </v-btn>
                     <v-btn x-small light fab color="error" @click="showdialog = true" v-if="!creating" depressed>
@@ -95,8 +95,7 @@
                     <v-card flat>
                       <v-row>
                         <v-col class="text-right">
-                          <v-btn class="mr-1" x-small light fab color="info"
-                            v-if="!creating" depressed>
+                          <v-btn class="mr-1" x-small light fab color="info" @click="createnewitemsize" depressed>
                             <v-icon>mdi-plus</v-icon>
                           </v-btn>
                         </v-col>
@@ -114,21 +113,7 @@
                         </tr>
                         </tbody>
                         </template>
-                        <template v-slot:item.actions="{ item }">
-                          <v-icon
-                            small
-                            class="mr-2"
-                            @click="editItem(item)"
-                          >
-                            mdi-pencil
-                          </v-icon>
-                          <v-icon
-                            small
-                            @click="deleteItem(item)"
-                          >
-                            mdi-delete
-                          </v-icon>
-                        </template>
+
                       </v-data-table>
                     </v-card>
                   </v-tab-item>
@@ -164,8 +149,41 @@
             </v-col>
           </v-row>
 
+          <v-dialog v-model="itemdialog" height="300" width="400">
+            <v-card >
+              <h4 class="ml-2">
+                Item Size Details
+              </h4>
+              <v-form v-model="valideditsize" ref="formeditsize" lazy-validation class="mt-3">
+                <v-container>
+                  <v-row dense>
+                    <v-col cols="6">
+                    <v-select dense :items="this.$store.state.itemsizes" label="Size"
+                      v-model="selecteditemsizepiece.itemsize" item-value="itemsizedescrip"
+                      item-text="itemsizedescrip"></v-select>
+                    </v-col>
+                    <v-col cols="6">
+                      <v-text-field type="number" dense v-model="selecteditemsizepiece.pieces" :counter="5" :rules="pieceRules"
+                        label="Pieces" >
+                      </v-text-field>
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </v-form>
+              <v-card-actions>
 
+                  <v-btn color="red" text @click="deleteitemsize" v-if="!creatingitemsize">
+                    Delete
+                  </v-btn>
 
+				   <v-spacer></v-spacer>
+                  <v-btn color="green darken-1" text @click="saveitemsize">
+                    Save
+                  </v-btn>
+
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
           <v-dialog v-model="showdialog" max-width="290">
             <v-card>
               <v-card-title class="headline">
@@ -214,20 +232,25 @@ export default {
     return {
       ...mapState(['counter', 'lastzindex', 'itemslistdata', 'vendorslistdata']),
       valid: false,
+      valideditsize: false,
       showdialog: false,
+      itemdialog: false,
       snackbar: false,
       snackbartext: '',
       creating: true,
-      tabitems: [
-		  { tab: 'Size/Piece' },
-          { tab: 'Pricing' }
-		],
+      creatingitemsize: false,
+      tabitems: [{ tab: 'Size/Piece' },{ tab: 'Pricing' }],
       tab: null,
-	  itemsizepiecelocal: [],
-	  itempricelocal: [],
-    proceedtodelete: false,
-	  selecteditemsizepiece: {},
-	  selecteditemprice: {},
+      itemsizepiecelocal: [],
+      itempricelocal: [],
+      proceedtodelete: false,
+      selecteditemprice: {},
+      selecteditemsizepiece: {
+		_id: '',
+        item_id: '',
+        itemsize: '',
+        pieces: 0,
+      },
       iteminfo: {
         iteminfoid: '',
         itemcode: '',
@@ -240,6 +263,18 @@ export default {
         v => !!v || 'Address ID is required',
         //v => (v && v.length <= 6) || 'Address ID must be 6 characters',
       ],
+      pieceRules: [
+        v => !!v || 'Piece/s is required',
+        //v => (v && v.length <= 6) || 'Address ID must be 6 characters',
+      ],
+      // numberRules: [
+      //   v => !!v || 'Address ID is required',
+      //   v => {
+      //       if (!v.trim()) return true;
+      //       if (!isNaN(parseFloat(v)) && v >= 0 && v <= 999) return true;
+      //       return 'Number has to be between 0 and 999';
+      //     },
+      // ],
       search: '',
       headers: [
         {text: 'Description',
@@ -276,13 +311,14 @@ export default {
 
 	async getSizePiece(){
 		try{
-            let res = await this.callApi('GET', '/itemsizepieces/'+this.iteminfo._id)
+      let res = await this.callApi('GET', '/itemsizepieces/specificsizepiece/'+this.iteminfo._id)
 			this.itemsizepiecelocal = res.data;
 
 		}catch(ex){
 		console.log(ex)
 		}
 	},
+
 	async getPrices(){
 		try{
             let res = await this.callApi('GET', '/itemprices/'+this.iteminfo._id)
@@ -316,6 +352,63 @@ export default {
           }
         }
       }
+    },
+
+    async saveitemsize(){
+      console.log(this.selecteditemsizepiece);
+      this.valideditsize = this.$refs.formeditsize.validate()
+      if(this.valideditsize){
+        try {
+          if(!this.creatingitemsize){
+			    //UPDATING
+            let res = await this.callApi('PATCH', '/itemsizepieces/'+this.selecteditemsizepiece._id, this.selecteditemsizepiece)
+            if(res.data.updated == true){
+              this.itemdialog = false;
+              //update also the local list
+              this.itemsizepiecelocal.find(x => x._id === this.selecteditemsizepiece._id).itemsize = this.selecteditemsizepiece.itemsize;
+              this.itemsizepiecelocal.find(x => x._id === this.selecteditemsizepiece._id).pieces = this.selecteditemsizepiece.pieces;
+            }
+          }
+          else{
+			    //CREATING
+            let res = await this.callApi('POST', '/itemsizepieces', this.selecteditemsizepiece)
+            if(res.data.created == true){
+              this.itemdialog = false;
+              this.creatingitemsize = false;
+              //add the newly added to the local list
+              this.itemsizepiecelocal.push(res.data.resdata);
+            }
+          }
+        }
+        catch(ex){
+          console.log(ex)
+        }
+      }
+    },
+
+	async deleteitemsize(){
+
+		//DELETING
+		let res = await this.callApi('DELETE', '/itemsizepieces/'+this.selecteditemsizepiece._id,)
+		if(res.data == true){
+		  this.itemdialog = false;
+		  this.creatingitemsize = false;
+		  //delete the deleted itemsizepiece
+		  let todelete = this.selecteditemsizepiece._id;
+		  this.itemsizepiecelocal = this.itemsizepiecelocal.filter(function( obj ) {
+		  return obj._id !== todelete
+		});
+		}
+	},
+
+    createnewitemsize() {
+      this.creatingitemsize = true;
+      this.itemdialog = true;
+      this.selecteditemsizepiece._id = '';
+      this.selecteditemsizepiece.item_id = this.iteminfo._id;
+      this.selecteditemsizepiece.pieces = 1;
+      this.selecteditemsizepiece.itemsize = "Piece";
+      console.log(this.selecteditemsizepiece);
     },
 
     async changetrigger(event){
@@ -362,6 +455,7 @@ export default {
     return new Intl.NumberFormat('en', { currency: 'USD', style: 'currency',}).format(amt)
   },
 
+
 	selectItem (item) {
       this.iteminfo._id= item._id
       this.iteminfo.itemcode = item.itemcode
@@ -379,8 +473,12 @@ export default {
     },
 
 	selectItemSizePiece(item){
-		this.selecteditemsizepiece = item;
-		console.log(item);
+		this.selecteditemsizepiece._id = item._id;
+		this.selecteditemsizepiece.itemsize = item.itemsize;
+		this.selecteditemsizepiece.pieces = item.pieces;
+		this.selecteditemsizepiece.item_id = item.item_id;
+		console.log(this.selecteditemsizepiece);
+    this.itemdialog = true;
 	},
 	selectItemPrice(item){
 		this.selecteditemprice = item;
@@ -446,7 +544,14 @@ export default {
     }
   },
    watch: {
-
+     itemdialog(a){
+       if(a == true && this.creatingitemsize == true)
+       {
+         this.selecteditemsizepiece.item_id = this.iteminfo._id;
+         this.selecteditemsizepiece.itemsize = "Piece";
+         this.selecteditemsizepiece.pieces = 1;
+       }
+     }
   },
   async created() {
 
