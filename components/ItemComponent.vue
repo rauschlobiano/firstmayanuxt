@@ -63,6 +63,11 @@
                         :counter="20" label="Code" @change="changetrigger">
                         </v-text-field>
                       </v-col>
+                      <v-spacer></v-spacer>
+                      <v-col cols="4">
+                        <v-switch v-model="iteminfo.active" flat :label="`Active: ${iteminfo.active.toString()}`" dense
+                        @change="changetrigger"></v-switch>
+                      </v-col>
                     </v-row>
                     <v-row dense>
                       <v-col cols="12">
@@ -120,7 +125,15 @@
                   <!-- ITEM PRICING -->
                   <v-tab-item>
                     <v-card flat>
-                      <v-data-table height="200px" :headers="headersprice" :items="itempricelocal" item-key="_id"
+                      <v-row>
+                        <v-col class="text-right">
+                          <v-btn class="mr-1" x-small light fab color="info" @click="createnewitemprice" depressed>
+                            <v-icon>mdi-plus</v-icon>
+                          </v-btn>
+                        </v-col>
+                      </v-row>
+
+                      <v-data-table height="200" :headers="headersprice" :items="itempricelocal" item-key="_id"
                         :items-per-page="15" class="elevation-1 my-0">
                         <template v-slot:body="{ items }">
                         <tbody>
@@ -171,19 +184,45 @@
                 </v-container>
               </v-form>
               <v-card-actions>
-
-                  <v-btn color="red" text @click="deleteitemsize" v-if="!creatingitemsize">
-                    Delete
-                  </v-btn>
-
-				   <v-spacer></v-spacer>
-                  <v-btn color="green darken-1" text @click="saveitemsize">
-                    Save
-                  </v-btn>
-
+                <v-btn color="red" text @click="deleteitemsize" v-if="!creatingitemsize">Delete</v-btn>
+                <v-spacer></v-spacer>
+                <v-btn color="green darken-1" text @click="saveitemsize"> Save</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
+
+
+          <v-dialog v-model="itempricedialog" height="300" width="400">
+            <v-card >
+              <h4 class="ml-2">
+                Item Price Details
+              </h4>
+              <v-form v-model="valideditprice" ref="formeditprice" lazy-validation class="mt-3">
+                <v-container>
+                  <v-row dense>
+                    <v-col cols="6">
+                    <v-select dense :items="this.$store.state.pricecodes" label="Price Code"
+                      v-model="selecteditemprice.pricecode" item-value="pricecodedescrip"
+                      item-text="pricecodedescrip">
+                    </v-select>
+                    </v-col>
+                    <v-col cols="6">
+                      <v-text-field type="number" dense v-model="selecteditemprice.price" :counter="8" :rules="priceRules"
+                        label="Price" >
+                      </v-text-field>
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </v-form>
+              <v-card-actions>
+                <v-btn color="red" text @click="deleteitemprice" v-if="!creatingitemprice">Delete</v-btn>
+                <v-spacer></v-spacer>
+                <v-btn color="green darken-1" text @click="saveitemprice">Save</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+
+
           <v-dialog v-model="showdialog" max-width="290">
             <v-card>
               <v-card-title class="headline">
@@ -233,20 +272,28 @@ export default {
       ...mapState(['counter', 'lastzindex', 'itemslistdata', 'vendorslistdata']),
       valid: false,
       valideditsize: false,
+      valideditprice: false,
       showdialog: false,
       itemdialog: false,
+      itempricedialog: false,
       snackbar: false,
       snackbartext: '',
       creating: true,
       creatingitemsize: false,
+      creatingitemprice: false,
       tabitems: [{ tab: 'Size/Piece' },{ tab: 'Pricing' }],
       tab: null,
       itemsizepiecelocal: [],
       itempricelocal: [],
       proceedtodelete: false,
-      selecteditemprice: {},
+      selecteditemprice: {
+        _id: '',
+        item_id: '',
+        price: 0,
+        pricecode: '',
+      },
       selecteditemsizepiece: {
-		_id: '',
+		    _id: '',
         item_id: '',
         itemsize: '',
         pieces: 0,
@@ -256,6 +303,7 @@ export default {
         itemcode: '',
         itemdescrip: '',
         supplierprofid: '',
+        active: true,
         updatedAt: '',
         editedBy: '',
       },
@@ -264,6 +312,10 @@ export default {
         //v => (v && v.length <= 6) || 'Address ID must be 6 characters',
       ],
       pieceRules: [
+        v => !!v || 'Piece/s is required',
+        //v => (v && v.length <= 6) || 'Address ID must be 6 characters',
+      ],
+      priceRules: [
         v => !!v || 'Piece/s is required',
         //v => (v && v.length <= 6) || 'Address ID must be 6 characters',
       ],
@@ -321,7 +373,7 @@ export default {
 
 	async getPrices(){
 		try{
-            let res = await this.callApi('GET', '/itemprices/'+this.iteminfo._id)
+            let res = await this.callApi('GET', '/itemprices/specificprice/'+this.iteminfo._id)
 			this.itempricelocal = res.data;
 
 		}catch(ex){
@@ -385,9 +437,52 @@ export default {
         }
       }
     },
+    async saveitemprice(){
+      console.log(this.selecteditemprice);
+      this.valideditprice = this.$refs.formeditprice.validate()
+      if(this.valideditprice){
+        try {
+          if(!this.creatingitemprice){
+			    //UPDATING
+            let res = await this.callApi('PATCH', '/itemprices/'+this.selecteditemprice._id, this.selecteditemprice)
+            if(res.data.updated == true){
+              this.itempricedialog = false;
+              //update also the local list
+              this.itempricelocal.find(x => x._id === this.selecteditemprice._id).price = this.selecteditemprice.price;
+              this.itempricelocal.find(x => x._id === this.selecteditemprice._id).pricecode = this.selecteditemprice.pricecode;
+            }
+          }
+          else{
+			    //CREATING
+            let res = await this.callApi('POST', '/itemprices', this.selecteditemprice)
+            if(res.data.created == true){
+              this.itempricedialog = false;
+              this.creatingitemprice = false;
+              //add the newly added to the local list
+              this.itempricelocal.push(res.data.resdata);
+            }
+          }
+        }
+        catch(ex){
+          console.log(ex)
+        }
+      }
+    },
 
+	async deleteitemprice(){
+		//DELETING
+		let res = await this.callApi('DELETE', '/itemprices/'+this.selecteditemprice._id,)
+		if(res.data == true){
+		  this.itempricedialog = false;
+		  this.creatingitemprice = false;
+		  //delete the deleted itemsizepiece
+		  let todelete = this.selecteditemprice._id;
+		  this.itempricelocal = this.itempricelocal.filter(function( obj ) {
+		  return obj._id !== todelete
+		});
+		}
+	},
 	async deleteitemsize(){
-
 		//DELETING
 		let res = await this.callApi('DELETE', '/itemsizepieces/'+this.selecteditemsizepiece._id,)
 		if(res.data == true){
@@ -409,6 +504,15 @@ export default {
       this.selecteditemsizepiece.pieces = 1;
       this.selecteditemsizepiece.itemsize = "Piece";
       console.log(this.selecteditemsizepiece);
+    },
+    createnewitemprice() {
+      this.creatingitemprice = true;
+      this.itempricedialog = true;
+      this.selecteditemprice._id = '';
+      this.selecteditemprice.item_id = this.iteminfo._id;
+      this.selecteditemprice.price = 0;
+      this.selecteditemprice.pricecode = "";
+      console.log(this.selecteditemprice);
     },
 
     async changetrigger(event){
@@ -458,6 +562,7 @@ export default {
 
 	selectItem (item) {
       this.iteminfo._id= item._id
+      this.iteminfo.active= item.active
       this.iteminfo.itemcode = item.itemcode
       this.iteminfo.itemdescrip = item.itemdescrip
       this.iteminfo.supplierprofid = item.supplierprofid
@@ -481,8 +586,13 @@ export default {
     this.itemdialog = true;
 	},
 	selectItemPrice(item){
-		this.selecteditemprice = item;
-		console.log(item);
+    this.creatingitemprice = false;
+    this.selecteditemprice._id = item._id;
+    this.selecteditemprice.item_id = item.item_id;
+    this.selecteditemprice.price = item.price;
+    this.selecteditemprice.pricecode = item.pricecode;
+		console.log(this.selecteditemprice);
+    this.itempricedialog = true;
 	},
 
     createnew(){
@@ -550,6 +660,14 @@ export default {
          this.selecteditemsizepiece.item_id = this.iteminfo._id;
          this.selecteditemsizepiece.itemsize = "Piece";
          this.selecteditemsizepiece.pieces = 1;
+       }
+     },
+     itempricedialog(a){
+       if(a == true && this.creatingitemprice == true)
+       {
+         this.selecteditemprice.item_id = this.iteminfo._id;
+         this.selecteditemprice.pricecode = "Base Price";
+         this.selecteditemprice.price = 1;
        }
      }
   },
