@@ -9,6 +9,7 @@ import Profgroup from "../models/profgroup.model";
 import Pricecode from "../models/pricecode.model";
 import ItemSizePiece from "../models/itemsizepiece.model";
 import ItemPrice from "../models/itemprice.model";
+import ItemSellTrans from "../models/itemselltrans.model";
 
 export const mongoOptions = {
   connectionString: env.mongo_conn,
@@ -30,5 +31,6 @@ export const mongoOptions = {
     Pricecode,
     ItemSizePiece,
     ItemPrice,
+    ItemSellTrans,
   ],
 };

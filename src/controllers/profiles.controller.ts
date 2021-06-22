@@ -21,6 +21,11 @@ export class ProfilesController {
     //98 is supplier
     return await this.services.getAllSuppliers();
   }
+  @Get("/clients")
+  async getAllClients({ params }: MayaJsContext): Promise<any> {
+    //1 is client
+    return await this.services.getAllClients();
+  }
 
   @Post()
   async createItems({ body }: MayaJsContext): Promise<any> {

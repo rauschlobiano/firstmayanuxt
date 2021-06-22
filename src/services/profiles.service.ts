@@ -17,6 +17,9 @@ export class ProfilesServices {
   async getAllSuppliers() {
     return await this.model.find({ proftype: "98" }, { accountname: 1 });
   }
+  async getAllClients() {
+    return await this.model.find({ proftype: "1" });
+  }
 
   //creates a new item
   async createNew(body: {}) {
