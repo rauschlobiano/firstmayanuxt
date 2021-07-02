@@ -8,7 +8,7 @@ export default {
         type: Number,
       },
       transdate: {
-        type: String,
+        type: Date,
       },
       transstatus: {
         type: String,
@@ -16,15 +16,27 @@ export default {
       pricecode: {
         type: String,
       },
+      status: {
+        type: String,
+      },
+      notes: {
+        type: String,
+      },
       transtotal: {
         type: Number,
       },
       client: {
-        type: Object,
+        ref: "Profile",
+        type: Schema.Types.ObjectId,
+        required: [true, "Client must be provided."],
       },
-      transitems: {
-        type: Array,
-      },
+      transitems: [
+        {
+          ref: "ItemSellTransItem",
+          type: Schema.Types.ObjectId,
+        },
+      ],
+
       createdBy: {
         type: String,
       },

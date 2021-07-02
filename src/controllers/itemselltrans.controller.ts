@@ -22,14 +22,14 @@ export class ItemselltransController {
   async readItemselltranslist(): Promise<any> {
     return await this.services.getalltransactionslist();
   }
+  @Post("/reporttrans")
+  async readItemsellreporttranslist({ body }: MayaJsContext): Promise<any> {
+    return await this.services.getallreporttrans(body);
+  }
 
   @Get("/:id")
   async readItemselltransByID({ params }: MayaJsContext): Promise<any> {
-    // Read Itemselltrans by ID from list
-    return {
-      message: "From ItemselltransController GET route with params ID",
-      params,
-    };
+    return this.services.getspeciftransaction(params.id);
   }
 
   @Put("/:id")
