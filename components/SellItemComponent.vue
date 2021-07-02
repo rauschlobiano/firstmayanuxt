@@ -14,13 +14,8 @@
             </v-col>
             <v-spacer> </v-spacer>
             <v-col cols="1" class="text-right">
-              <v-btn
-                x-small
-                icon
-                dark
-                @click="tellParentToHideThis"
-                class="mr-1"
-              >
+              <v-btn x-small icon  dark
+                @click="tellParentToHideThis" class="mr-1">
                 <v-icon>mdi-power</v-icon>
               </v-btn>
             </v-col>
@@ -29,41 +24,24 @@
         <v-container>
           <v-row>
             <v-col cols="3">
-              <v-text-field
-                dense
-                v-model="search"
-                append-icon="mdi-magnify"
-                label="Search"
-                single-line
-                hide-details
-              ></v-text-field>
+              <v-text-field dense v-model="search"  append-icon="mdi-magnify"  label="Search"
+                single-line hide-details>
+              </v-text-field>
 
-              <v-data-table
-                height="500px"
-                :headers="headers"
-                :items="this.$store.state.itemselltrans"
-                item-key="_id"
-                no-data-text="No Data"
-                :hide-default-header="true"
-                :hide-default-footer="true"
-                class="elevation-1 my-0"
-                :search="search"
-              >
+              <v-data-table height="500px" :headers="headers" :items="this.$store.state.itemselltrans"
+                item-key="_id"  no-data-text="No Data" :hide-default-header="true" :hide-default-footer="true"
+                class="elevation-1 my-0" :search="search">
                 <template v-slot:body="{ items }">
                   <tbody>
-                    <tr
-                      v-for="item in items"
-                      :key="item._id"
-                      @click="selectItem(item)"
+                    <tr v-for="item in items" :key="item._id" @click="selectItem(item)"
                       :class="{
-                        selectedRow: item._id == transinfo._id,
-                      }"
-                    >
+                        selectedRow: item._id == selectedtrans._id,
+                      }">
                       <!-- <td>{{ String(item.transno).padStart(6, "0") }}</td> -->
                       <td>
                         {{ String(item._id).substring(item._id.length - 6) }}
                       </td>
-                      <td>{{ item.clientname }}</td>
+                      <td>{{ item.client.accountname }}</td>
                     </tr>
                   </tbody>
                 </template>
@@ -76,81 +54,49 @@
                   <v-row class="mt-4">
                     <!-- CLIENT -->
                     <v-col cols="8">
-                      <v-autocomplete
-                        dense
-                        flat
-                        light
-                        v-model="profselect"
-                        :loading="profloading"
-                        :items="profitems"
-                        :search-input.sync="profsearch"
-                        cache-items
-                        class="caption"
-                        hide-no-data
-                        hide-details
-                        label="Client/Customer"
-                        @change="autocompleteselectprofile"
+                      <v-autocomplete dense flat light v-model="profselect" v-if="creating"
+                        :loading="profloading" :items="profitems"  :search-input.sync="profsearch"
+                        cache-items class="caption" hide-no-data  hide-details
+                        label="Client/Customer"  @change="autocompleteselectprofile"
                       >
                       </v-autocomplete>
+                      <v-text-field v-model="selectedtrans.clientname" dense label="Client/Customer" readonly v-if="!creating">
+                      </v-text-field>
                     </v-col>
                     <!-- PRICE CODE -->
                     <v-col cols="4">
-                      <v-select
-                        v-model="pricecode"
-                        dense
-                        :rules="inputRules"
-                        class="caption"
-                        :items="this.$store.state.pricecodes"
-                        label="Price Code"
-                        item-text="pricecodedescrip"
-                        item-value="pricecodedescrip"
-                        @change="pricecodechanged"
+                      <v-select v-model="pricecode" dense :rules="inputRules" class="caption" v-if="creating"
+                        :items="this.$store.state.pricecodes" label="Price Code"
+                        item-text="pricecodedescrip"  item-value="pricecodedescrip"  @change="pricecodechanged"
                       >
                       </v-select>
+
+                      <v-text-field v-model="selectedtrans.pricecode" dense label="Price Code" readonly v-if="!creating">
+                      </v-text-field>
                     </v-col>
                   </v-row>
 
-                  <v-row dense>
+                  <v-row dense >
                     <v-col>
-                      <v-card>
+                      <v-card v-if="creating">
                         <v-container>
-                          <v-form
-                            v-model="validsale"
-                            ref="saleform"
-                            lazy-validation
-                            v-if="creating"
-                          >
+                          <v-form v-model="validsale" ref="saleform"
+                            lazy-validation >
                             <v-row class="mt-2">
                               <!-- ITEM DESCRIPTION -->
                               <v-col cols="8">
-                                <v-autocomplete
-                                  light
-                                  v-model="itemselect"
-                                  :loading="itemloading"
-                                  :items="itemitems"
-                                  :search-input.sync="itemsearch"
-                                  cache-items
-                                  class="caption pa-0 ma-0"
-                                  hide-no-data
-                                  hide-details
-                                  label="Item Description"
-                                  :rules="inputRules"
-                                  @change="autocompleteselectitem"
-                                ></v-autocomplete>
+                                <v-autocomplete light v-model="itemselect" :loading="itemloading"
+                                  :items="itemitems" :search-input.sync="itemsearch" cache-items
+                                  class="caption pa-0 ma-0" hide-no-data hide-details label="Item Description"
+                                  :rules="inputRules"  @change="autocompleteselectitem">
+                                </v-autocomplete>
                               </v-col>
                               <!-- ITEM SIZE -->
                               <v-spacer></v-spacer>
                               <v-col cols="3" class="py-0 my-0">
-                                <v-select
-                                  v-model="itemsize"
-                                  dense
-                                  :rules="inputRules"
-                                  :items="localitemsizes"
-                                  label="Size"
-                                  item-text="itemsize"
-                                  class="centered-input caption"
-                                  item-value="itemsize"
-                                  @change="selectsize"
+                                <v-select v-model="itemsize" dense :rules="inputRules" :items="localitemsizes"
+                                  label="Size"  item-text="itemsize" class="centered-input caption"
+                                  item-value="itemsize" @change="selectsize"
                                 >
                                 </v-select>
                               </v-col>
@@ -158,32 +104,20 @@
                             <v-row dense>
                               <!-- QUANTITY -->
                               <v-col cols="3" class="py-0 my-0">
-                                <v-text-field
-                                  v-model="quantity"
-                                  label="Quantity"
-                                  class="centered-input caption"
-                                  :rules="inputRules"
-                                >
+                                <v-text-field v-model="quantity" label="Quantity"
+                                  class="centered-input caption" :rules="inputRules">
                                 </v-text-field>
                               </v-col>
                               <!-- PRICE EACH -->
                               <v-col cols="3" class="py-0 my-0">
-                                <v-text-field
-                                  class="right-input caption"
-                                  readonly
-                                  v-model="priceeachdisplay"
-                                  label="Price Each"
-                                  :rules="inputRules"
-                                >
+                                <v-text-field class="right-input caption" readonly v-model="priceeachdisplay"
+                                  label="Price Each" :rules="inputRules">
                                 </v-text-field>
                               </v-col>
                               <!-- TOTAL COST -->
                               <v-col cols="3" class="py-0 my-0">
-                                <v-text-field
-                                  class="right-input caption"
-                                  readonly
-                                  v-model="totalcostdisplay"
-                                  label="Price Total"
+                                <v-text-field class="right-input caption"
+                                  readonly v-model="totalcostdisplay" label="Price Total"
                                   :rules="inputRules"
                                 >
                                 </v-text-field>
@@ -191,13 +125,8 @@
                               <v-spacer></v-spacer>
                               <!-- ADD BUTTON -->
                               <v-col cols="3" class="text-right pb-0 mr-0">
-                                <v-btn
-                                  dark
-                                  small
-                                  color="success"
-                                  text
-                                  @click="addtobasket"
-                                >
+                                <v-btn dark  small color="success"
+                                  text @click="addtobasket">
                                   <v-icon>mdi-arrow-down</v-icon> Add
                                 </v-btn>
                               </v-col>
@@ -213,14 +142,8 @@
                   <v-row>
                     <v-col>
                       <div class="text-right mb-3">
-                        <v-btn
-                          class="mr-1"
-                          small
-                          outlined
-                          color="primary"
-                          @click="createnew"
-                          v-if="!creating"
-                          depressed
+                        <v-btn class="mr-1" small  outlined color="primary"
+                          @click="createnew" v-if="!creating" depressed
                           ><v-icon>mdi-plus</v-icon> Create
                         </v-btn>
                       </div>
@@ -231,44 +154,43 @@
                       <v-simple-table>
                         <template v-slot:default>
                           <tbody class="text-right">
-                            <tr>
+                            <tr v-if="!creating">
                               <td>Trans # :</td>
                               <td class="font-weight-bold">
-                                {{ transinfo.transno }}
+                                {{ String(selectedtrans._id).substring(selectedtrans._id.length - 6) }}
                               </td>
                             </tr>
                             <tr>
                               <td>Date :</td>
                               <td class="font-weight-bold">
-                                {{ transinfo.transdate }}
+                                <span v-if="!creating">{{ transinfo.transdate }}</span>
+                                <span v-if="creating">
+                                  <v-text-field class="right-input caption" v-model="transinfo.transdate"
+                                    label="" :rules="dateRules" @change="transdateChanged">
+                                  </v-text-field>
+                                </span>
                               </td>
                             </tr>
-                            <tr>
+                            <tr v-if="!creating">
                               <td>Status :</td>
                               <td class="font-weight-bold">
                                 {{ transinfo.status }}
                               </td>
                             </tr>
-                            <tr
-                              style="height: 35px; background-color: palegreen"
-                              class="mt-2"
-                            >
+                            <tr style="height: 35px; background-color: lightblue" class="mt-2">
                               <td>Total :</td>
-                              <td
-                                class="font-weight-bold"
-                                style="font-size: 20px; color: darkgreen"
-                              >
+                              <td  class="font-weight-bold" style="font-size: 20px; color: darkgreen">
                                 {{ grandtotaldisplay }}
                               </td>
                             </tr>
-                            <tr>
+                            <!-- <tr>
                               <td>Tendered :</td>
                               <td>0</td>
                             </tr>
                             <tr>
                               <td>Change :</td>
                               <td>0</td>
-                            </tr>
+                            </tr> -->
                           </tbody>
                         </template>
                       </v-simple-table>
@@ -280,37 +202,20 @@
                 <v-col cols="12">
                   <div class="caption font-weight-bold">Items to be sold:</div>
                   <v-data-table
-                    height="200px"
-                    :headers="transitemsheader"
-                    :items="transinfo.transitems"
-                    item-key="itemcounter"
-                    no-data-text="No Items"
-                    :hide-default-footer="true"
-                    class="elevation-1 my-0"
-                  >
+                    height="200px" :headers="transitemsheader"  :items="transinfo.transitems" item-key="itemcounter" no-data-text="No Items"
+                    :hide-default-footer="true" class="elevation-1 my-0">
                   </v-data-table>
                 </v-col>
               </v-row>
               <v-row>
                 <v-col cols="9">
-                  <v-text-field
-                    class="button"
-                    v-model="remarks"
-                    label="Notes/Remarks"
-                  >
+                  <v-text-field class="button" v-model="transinfo.notes"
+                    label="Notes" :readonly="!creating">
                   </v-text-field>
                 </v-col>
                 <v-col cols="2">
-                  <v-btn
-                    dark
-                    small
-                    color="success"
-                    @click="savetransaction"
-                    v-if="creating"
-                    bottom
-                    right
-                    absolute
-                  >
+                  <v-btn dark small  color="success"  @click="savetransaction"
+                    v-if="creating"  bottom  right absolute>
                     <v-icon small>mdi-content-save</v-icon> Save
                   </v-btn>
                 </v-col>
@@ -358,7 +263,6 @@ export default {
       profselect: null,
       profloading: false,
       profitems: [],
-      remarks: "",
       //autocomplete items
       itemsearch: null,
       itemselect: null,
@@ -381,15 +285,22 @@ export default {
       itemcounter: 0,
 
       grandtotaldisplay: "0.0",
+      selectedtrans: {
+        _id: '',
+        clientname: '',
+        pricecode: '',
+		status: '',
+      },
       transinfo: {
-        transno: 1,
-        transdate: "2021-01-01",
+        transdate: '',
         transstatus: "Posted",
-        client_id: "",
+        client: "",
         clientname: "",
         pricecode: "",
+		status: "Posted",
         transtotal: 0,
         transitems: [],
+		notes: "",
       },
       validsale: false,
       valid: false,
@@ -399,10 +310,14 @@ export default {
         (v) => !!v || "Required",
         //v => (v && v.length <= 6) || 'Address ID must be 6 characters',
       ],
+	  dateRules: [
+		(v) => !!v || "Required",
+		v => (v && this.validateDate(v)) || 'Invalid Date',
+	  ],
 
       headers: [
         { text: "TransID", align: "center", value: "_id" },
-        { text: "Client/Customer", align: "start", value: "clientname" },
+        { text: "Client/Customer", align: "start", value: "client.accountname" },
       ],
       transitemsheader: [
         {
@@ -469,7 +384,7 @@ export default {
           fixed: true,
         },
       ],
-      creating: true,
+      creating: false,
       positions: {
         clientX: undefined,
         clientY: undefined,
@@ -487,18 +402,25 @@ export default {
     async savetransaction() {
       //can't do form validation here because there's another form in the middle
       //doing manual validation
-      //if (Object.keys(this.transinfo.client_id).length === 0) {
-      if (this.transinfo.client_id.length <= 0) {
+      //if (Object.keys(this.transinfo.client).length === 0) {
+      if (this.transinfo.client.length <= 0) {
         this.snackbar = true;
         this.snackbartext = "Please select Client/Customer";
       } else if (parseFloat(this.transinfo.transtotal) <= 0) {
         this.snackbar = true;
         this.snackbartext =
           "There is no transaction to save based on the Totals";
-      } else {
+      }
+		else if(!this.validateDate(this.transinfo.transdate)){
+			this.snackbar = true;
+        this.snackbartext =
+          "There is no transaction to save based on the Totals";
+		}
+	  else {
         this.snackbar = false;
         this.transinfo.pricecode = this.pricecode;
-
+        // let newtransdate = new Date(this.transinfo.transdate);
+        // this.transinfo.transdate = newtransdate;
         let res = await this.callApi("POST", "/itemselltrans", this.transinfo);
         console.log(res);
         if (res.data.created) {
@@ -521,16 +443,25 @@ export default {
     async getalltransactions() {
       let res = await this.callApi("GET", "/itemselltrans/translist");
       if (res.data) {
-        let newlist = [];
-        console.log(res.data);
-        // res.data.forEach((element) => {
-        //   newlist.push(element.clientname);
-        // });
         this.updateItemSellTrans(res.data);
       } else {
         console.log("There are no transaction data.");
       }
     },
+
+	validateDate(dt){
+		var m = moment(dt, 'MM/DD/YYYY');
+		return m.isValid();
+	},
+
+	transdateChanged(newdate) {
+		if(this.creating){
+			if(!this.validateDate(newdate)){
+				this.snackbar = true;
+				this.snackbartext = "Invalid Date";
+			};
+		}
+	},
 
     clearAll() {
       //autocomplete profile
@@ -538,7 +469,7 @@ export default {
       this.profselect = null;
       this.profloading = false;
       this.profitems = [];
-      this.remarks = "";
+
       //autocomplete items
       this.itemsearch = null;
       this.itemselect = null;
@@ -562,6 +493,14 @@ export default {
       this.transinfo.transitems = [];
       this.grandtotaldisplay = "0.0";
 
+
+	this.transinfo.client = "";
+	this.transinfo.clientname = "";
+
+	this.transinfo.transtotal = 0;
+	this.transinfo.transitems = [];
+	this.transinfo.notes = "";
+
       this.validsale = false;
       this.valid = false;
       this.search = "";
@@ -572,7 +511,8 @@ export default {
     createnew() {
       this.clearAll();
       this.creating = true;
-      console.log("creating new...");
+      //set the date today automatically
+      this.transinfo.transdate = moment().format('MM/DD/YYYY');
     },
     computetotal() {
       this.transinfo.transtotal = 0;
@@ -581,7 +521,7 @@ export default {
       });
       //this.grandtotaldisplay = new Intl.NumberFormat().format(this.grandtotal)
       this.grandtotaldisplay = new Intl.NumberFormat("en", {
-        currency: "PHP",
+        currency: "Php",
         style: "currency",
       }).format(this.transinfo.transtotal);
     },
@@ -618,16 +558,13 @@ export default {
     },
 
     autocompleteselectprofile(selected) {
-      let found = this.$store.state.profileslistdata.find(function (
-        item,
-        index
-      ) {
+      console.log(selected);
+      let found = this.$store.state.profileslistdata.find(function (item,index) {
         if (item.accountname == selected) return item;
       });
 
       if (found) {
-        this.transinfo.client_id = found._id;
-        this.transinfo.clientname = found.accountname;
+        this.transinfo.client = found._id;
         this.transinfo.pricecode = found.pricecode;
         this.pricecode = found.pricecode;
       }
@@ -712,10 +649,8 @@ export default {
       }
     },
     pricecodechanged(val) {
-      console.log("pricecode changed....");
       this.pricecode = val;
       this.transinfo.pricecode = val;
-      console.log(this.transinfo);
     },
 
     increment() {
@@ -755,7 +690,37 @@ export default {
 
     selectItem(item) {
       this.creating = false;
-      this.transinfo.transno = item.transno;
+      this.selectedtrans._id = item._id;
+      console.log(item);
+      //fetch the details
+      this.getspecifictrans(item._id);
+    },
+
+    async getspecifictrans(id) {
+		this.clearAll();
+      let res = await this.callApi("GET", "/itemselltrans/" + id);
+      if (res.data)
+      {
+        console.log(res.data);
+        let info = res.data;
+        this.selectedtrans.clientname = info.client.accountname;
+        this.selectedtrans.pricecode = info.pricecode;
+
+        this.transinfo._id = info._id;
+        this.transinfo.transdate = moment(info.transdate).format('MM/DD/YYYY');
+        this.transinfo.transstatus = info.transstatus;
+
+        this.transinfo.clientname = info.client.accountname;
+        this.transinfo.pricecode = info.pricecode;
+        this.transinfo.transtotal = info.transtotal;
+        this.grandtotaldisplay = this.currencyformat(info.transtotal);
+        this.transinfo.transitems = info.transitems;
+        this.transinfo.notes = info.notes;
+      }
+      else
+      {
+        console.log("Not found");
+      }
     },
 
     incrementZindex() {

@@ -1,19 +1,44 @@
 <template>
   <v-app>
     <v-app-bar app color="deep-purple" dense dark fixed>
-      <v-toolbar-title>Valhalla Goods Inc.</v-toolbar-title>
+      <v-toolbar-title>Valhalla Online Services</v-toolbar-title>
       <h1 class="mx-4" style="color: gray">|</h1>
-      <v-btn @click="clickProfile" icon>
-        <v-icon>mdi-account-group</v-icon>
-      </v-btn>
 
-      <v-btn @click="clickItem" icon>
-        <v-icon>mdi-cart</v-icon>
-      </v-btn>
+       <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn @click="clickProfile" icon v-bind="attrs"  v-on="on">
+            <v-icon>mdi-account-group</v-icon>
+          </v-btn>
+        </template>
+        <span>Profiles</span>
+      </v-tooltip>
 
-      <v-btn @click="clickSellItem" icon>
-        <v-icon>mdi-printer-pos</v-icon>
-      </v-btn>
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn @click="clickItem" icon v-bind="attrs"  v-on="on">
+            <v-icon>mdi-cart</v-icon>
+          </v-btn>
+        </template>
+        <span>Items</span>
+      </v-tooltip>
+
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn @click="clickSellItem" icon v-bind="attrs"  v-on="on">
+            <v-icon>mdi-printer-pos</v-icon>
+          </v-btn>
+        </template>
+        <span>Sell Item</span>
+      </v-tooltip>
+
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn @click="clickReportViewer" icon v-bind="attrs"  v-on="on">
+            <v-icon>mdi-bookshelf</v-icon>
+          </v-btn>
+        </template>
+        <span>Reports</span>
+      </v-tooltip>
     </v-app-bar>
     <v-main>
       <v-row>
@@ -45,6 +70,14 @@
           </SellItemComponent>
         </div>
 
+        <div data-app>
+          <ReportViewerComponent
+            :showflag="showhidereportviewer"
+            @formclose="closeFromReportViewer"
+          >
+          </ReportViewerComponent>
+        </div>
+
         <v-card
           class="mx-auto mt-10"
           height="120"
@@ -73,12 +106,13 @@ import { mapState, mapMutations } from "vuex";
 import ProfileComponent from "~/components/ProfileComponent";
 import ItemComponent from "~/components/ItemComponent";
 import SellItemComponent from "~/components/SellItemComponent";
+import ReportViewerComponent from "~/components/ReportViewerComponent";
 
 export default {
   components: {
     ProfileComponent,
     ItemComponent,
-    SellItemComponent,
+    SellItemComponent,ReportViewerComponent
   },
   data: function () {
     return {
@@ -86,6 +120,7 @@ export default {
       showhideprof: false,
       showhideitem: false,
       showhidesellitem: false,
+      showhidereportviewer: false,
       connected: true,
       reconnecting: false,
       remainingtime: 10,
@@ -121,6 +156,10 @@ export default {
       //this.$store.dispatch('actionShowHideProfile')
       this.showhidesellitem = !this.showhidesellitem;
     },
+    clickReportViewer() {
+      //this.$store.dispatch('actionShowHideProfile')
+      this.showhidereportviewer = !this.showhidereportviewer;
+    },
     closeFromProfile(showhide) {
       this.showhideprof = showhide;
     },
@@ -129,6 +168,9 @@ export default {
     },
     closeFromSellItem(showhide) {
       this.showhidesellitem = showhide;
+    },
+    closeFromReportViewer(showhide) {
+      this.showhidereportviewer = showhide;
     },
     //profiles
     async getallprofiles(state) {

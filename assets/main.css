@@ -73,3 +73,15 @@ input::placeholder {
   padding-bottom: 5px;
   background-color: seagreen;
 }
+#draggable-container-reportviewer {
+  position: absolute;
+  z-index: 9;
+  width: 600px;
+}
+#draggable-header-reportviewer {
+  z-index: 10;
+  padding-left: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background-color: rgb(112, 36, 36);
+}
