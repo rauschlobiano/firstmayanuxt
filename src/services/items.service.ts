@@ -11,8 +11,7 @@ export class ItemsServices {
 
   //returns all items
   async getAll() {
-    return await this.model.find({});
-    //.sort({ _id: -1 });
+    return await this.model.find({}).sort({ _id: -1 });
   }
 
   //creates a new item

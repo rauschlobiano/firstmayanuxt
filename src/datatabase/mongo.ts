@@ -11,6 +11,7 @@ import ItemSizePiece from "../models/itemsizepiece.model";
 import ItemPrice from "../models/itemprice.model";
 import ItemSellTrans from "../models/itemselltrans.model";
 import ItemSellTransItem from "../models/itemselltransitems.model";
+import ItemInventory from "../models/iteminventory.model";
 
 export const mongoOptions = {
   connectionString: env.mongo_conn,
@@ -34,5 +35,6 @@ export const mongoOptions = {
     ItemPrice,
     ItemSellTransItem,
     ItemSellTrans,
+    ItemInventory,
   ],
 };

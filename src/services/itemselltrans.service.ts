@@ -34,8 +34,19 @@ export class ItemselltransServices {
       .find({
         transdate: { $gte: datefrom, $lte: dateto },
       })
-
       .populate([{ path: "transitems" }, { path: "client" }]);
+  }
+  async getallreportitemsales(body: { filters: { dateFrom: ""; dateTo: "" } }) {
+    //reformat date
+    let datefrom = new Date(body.filters.dateFrom);
+    let dateto = new Date(body.filters.dateTo);
+
+    return await this.model
+      .find(
+        { transdate: { $gt: datefrom, $lt: dateto } },
+        { transdate: 1, transitems: 1, pricecode: 1, transtotal: 1 }
+      )
+      .populate([{ path: "transitems" }]);
   }
 
   async getspeciftransaction(_id: string) {

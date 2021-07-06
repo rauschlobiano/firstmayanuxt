@@ -20,6 +20,8 @@ import { ItempricesController } from "./controllers/itemprices.controller";
 import { ItempricesServices } from "./services/itemprices.service";
 import { ItemselltransController } from "./controllers/itemselltrans.controller";
 import { ItemselltransServices } from "./services/itemselltrans.service";
+import { IteminventoryController } from "./controllers/iteminventory.controller";
+import { IteminventoryServices } from "./services/iteminventory.service";
 
 @Module({
   declarations: [
@@ -31,6 +33,7 @@ import { ItemselltransServices } from "./services/itemselltrans.service";
     ItemsizepiecesController,
     ItempricesController,
     ItemselltransController,
+    IteminventoryController,
   ],
   imports: [RouterModule.forRoot(routes), MongoDbModule.forRoot(mongoOptions)],
   providers: [
@@ -42,6 +45,7 @@ import { ItemselltransServices } from "./services/itemselltrans.service";
     ItemsizepiecesServices,
     ItempricesServices,
     ItemselltransServices,
+    IteminventoryServices,
   ],
   bootstrap: AppController,
 })
