@@ -4,7 +4,7 @@
       <v-toolbar-title>Valhalla Online Services</v-toolbar-title>
       <h1 class="mx-4" style="color: gray">|</h1>
 
-       <v-tooltip bottom>
+       <v-tooltip bottom style="z-index: 1000;">
         <template v-slot:activator="{ on, attrs }">
           <v-btn @click="clickProfile" icon v-bind="attrs"  v-on="on">
             <v-icon>mdi-account-group</v-icon>
@@ -13,7 +13,7 @@
         <span>Profiles</span>
       </v-tooltip>
 
-      <v-tooltip bottom>
+      <v-tooltip bottom style="z-index: 1000;">
         <template v-slot:activator="{ on, attrs }">
           <v-btn @click="clickItem" icon v-bind="attrs"  v-on="on">
             <v-icon>mdi-cart</v-icon>
@@ -22,32 +22,43 @@
         <span>Items</span>
       </v-tooltip>
 
-      <v-tooltip bottom>
+
+      <v-tooltip bottom style="z-index: 1000;">
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn @click="clickInventoryIn" icon v-bind="attrs"  v-on="on">
+            <v-icon>mdi-truck</v-icon>
+          </v-btn>
+        </template>
+        <span>Receiving</span>
+      </v-tooltip>
+
+      <v-tooltip bottom style="z-index: 1000;">
         <template v-slot:activator="{ on, attrs }">
           <v-btn @click="clickSellItem" icon v-bind="attrs"  v-on="on">
-            <v-icon>mdi-printer-pos</v-icon>
+            <v-icon>mdi-point-of-sale</v-icon>
           </v-btn>
         </template>
         <span>Sell Item</span>
       </v-tooltip>
 
-      <v-tooltip bottom>
+      <v-tooltip bottom style="z-index: 1000;">
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn @click="clickInventory" icon v-bind="attrs"  v-on="on">
+            <v-icon>mdi-warehouse</v-icon>
+          </v-btn>
+        </template>
+        <span>Inventory</span>
+      </v-tooltip>
+
+      <v-tooltip bottom style="z-index: 1000;">
         <template v-slot:activator="{ on, attrs }">
           <v-btn @click="clickReportViewer" icon v-bind="attrs"  v-on="on">
-            <v-icon>mdi-bookshelf</v-icon>
+            <v-icon>mdi-file-chart</v-icon>
           </v-btn>
         </template>
         <span>Reports</span>
       </v-tooltip>
 
-      <v-tooltip bottom>
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn @click="clickInventory" icon v-bind="attrs"  v-on="on">
-            <v-icon>mdi-truck-delivery</v-icon>
-          </v-btn>
-        </template>
-        <span>Inventory</span>
-      </v-tooltip>
 
 
     </v-app-bar>
@@ -96,6 +107,14 @@
           </InventoryComponent>
         </div>
 
+        <div data-app>
+          <ReceivingComponent
+            :showflag="showhideinventoryin"
+            @formclose="closeFromInventoryIn"
+          >
+          </ReceivingComponent>
+        </div>
+
         <v-card
           class="mx-auto mt-10"
           height="120"
@@ -126,11 +145,12 @@ import ItemComponent from "~/components/ItemComponent";
 import SellItemComponent from "~/components/SellItemComponent";
 import ReportViewerComponent from "~/components/ReportViewerComponent";
 import InventoryComponent from "~/components/InventoryComponent";
+import ReceivingComponent from "~/components/ReceivingComponent";
 
 export default {
   components: {
     ProfileComponent, ItemComponent,
-    SellItemComponent,ReportViewerComponent,InventoryComponent
+    SellItemComponent,ReportViewerComponent,InventoryComponent,ReceivingComponent
   },
   data: function () {
     return {
@@ -140,6 +160,7 @@ export default {
       showhidesellitem: false,
       showhidereportviewer: false,
       showhideinventory: false,
+      showhideinventoryin: false,
       connected: true,
       reconnecting: false,
       remainingtime: 10,
@@ -155,6 +176,7 @@ export default {
       "updateProfileTypeList",
       "updateItemList",
       "updateVendorList",
+      "updateVendorArray",
       "updateItemArray",
       "updateItemSize",
       "updateItemSizePiece",
@@ -180,8 +202,10 @@ export default {
       this.showhidereportviewer = !this.showhidereportviewer;
     },
     clickInventory() {
-      //this.$store.dispatch('actionShowHideProfile')
       this.showhideinventory = !this.showhideinventory;
+    },
+    clickInventoryIn() {
+      this.showhideinventoryin = !this.showhideinventoryin;
     },
     closeFromProfile(showhide) {
       this.showhideprof = showhide;
@@ -197,6 +221,9 @@ export default {
     },
     closeFromInventory(showhide) {
       this.showhideinventory = showhide;
+    },
+    closeFromInventoryIn(showhide) {
+      this.showhideinventoryin = showhide;
     },
     //profiles
     async getallprofiles(state) {
@@ -245,6 +272,13 @@ export default {
       console.log("getting all vendors");
       let res = await this.callApi("get", "/profiles/suppliers");
       this.updateVendorList(res.data);
+
+      //create the vendors array
+      let vendorsarray = [];
+      res.data.forEach((element) => {
+        vendorsarray.push(element.accountname);
+      });
+      this.updateVendorArray(vendorsarray);
     },
 
     //taggings

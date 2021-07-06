@@ -33,15 +33,48 @@
 
           <v-row>
             <v-col>
-              <v-data-table height="500px" :headers="headers" :items="inventoryData"
+              <v-data-table :headers="headers" :items="inventoryData"
                 item-key="_id"  no-data-text="No Data" :hide-default-footer="true"
                 class="elevation-1 my-0" :search="search"  disable-pagination>
+                <template v-slot:body="{ items }">
+                  <tbody>
+                    <tr
+                      v-for="item in items"
+                      :key="item._id"
+                      @click="selectItem(item)"
+                      :class="{
+                        selectedRow: item._id == selectedItem._id,
+                      }"
+                    >
+                      <td>{{ item._id }}</td>
+                      <td>{{ item.itemdescrip }}</td>
+                      <td>{{ item.totalpieces }}</td>
+                    </tr>
+                  </tbody>
+                </template>
               </v-data-table>
             </v-col>
           </v-row>
 
         </v-container>
       </v-card>
+
+      <v-dialog v-model="showdialog" max-width="400">
+        <v-card>
+          <v-card-title class="headline"> Item Transactions History </v-card-title>
+          <v-card-text>
+            <strong> Item:  {{ selectedItem.itemdescrip}} </strong>
+          <v-row>
+            <v-col>
+              <v-data-table :headers="historyHeaders" :items="historyData"  height="400px"
+                item-key="_id"  no-data-text="No Data" :hide-default-footer="true"
+                class="elevation-1 my-0" :search="search"  disable-pagination>
+              </v-data-table>
+            </v-col>
+          </v-row>
+        </v-card-text>
+        </v-card>
+      </v-dialog>
 
       <v-snackbar v-model="snackbar">
         {{ snackbartext }}
@@ -65,21 +98,25 @@
 
     data: function () {
       return {
+        showdialog: false,
         search: '',
         snackbar: false,
         snackbartext: '',
         asofdate: '',
-        selectedReportType: 1,
+        selectedItem: {_id: '', itemdescrip: ''},
         filters: {
           dateTo: '',
         },
-        inventoryData: [
-
-        ],
+        inventoryData: [ ],
+        historyData: [ ],
         headers: [
           { text: 'Code', value: '_id',},
           { text: 'Item Description', value: 'itemdescrip',},
           { text: 'Pieces', value: 'totalpieces' },
+        ],
+        historyHeaders: [
+          { text: 'Date', value: 'transdate',},
+          { text: 'Pieces', value: 'totalinventory' },
         ],
           positions: {
               clientX: undefined,
@@ -99,24 +136,53 @@
         // Pass the element id here
         await this.$htmlToPaper('printMe');
       },
+      selectItem(item){
+        console.log(item);
+        this.selectedItem._id = item._id;
+        this.selectedItem.itemdescrip = item.itemdescrip;
+        //show dialog
+        this.showdialog = true;
+        this.getHistoryData(item._id);
+      },
       async getInventoryData() {
-        //validate filters
-        // if(!this.validateDate(this.filters.dateFrom)){
-        //   this.snackbar = true;
-				//   this.snackbartext = "Invalid Date-From";
-        // }
-        // else
-        // {
+        this.inventoryData = [];
         console.log('Getting inventory data...');
         let res = await this.callApi("POST", "/iteminventory/inventorycount", {filters: this.filters});
-        console.log(res);
+
         if(Array.isArray(res.data))
         {
           let newarray = [];
           res.data.forEach(x => {
             x.totalpieces = this.commaSeparate(x.totalpieces);
-            this.inventoryData.push(x);
+            newarray.push(x);
           });
+          this.inventoryData = newarray;
+        }
+        else
+        {
+          this.snackbar = true;
+          this.snackbartext = "There is no data to load."
+        }
+
+      },
+      async getHistoryData(itemcode) {
+        this.historyData = [];
+        console.log('Getting history data...');
+        let res = await this.callApi("GET", "/iteminventory/itemhistory/"+itemcode,);
+        console.log(res);
+        if(Array.isArray(res.data))
+        {
+          let newarray = [];
+            res.data.forEach(x => {
+              x.transdate = moment(x.transdate).format('MM/DD/YYYY');
+              newarray.push(x);
+          });
+          this.historyData = newarray;
+        }
+        else
+        {
+          this.snackbar = true;
+          this.snackbartext = "There is no data to load."
         }
 
       },

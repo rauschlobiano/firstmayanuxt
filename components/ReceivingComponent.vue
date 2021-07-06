@@ -1,16 +1,12 @@
 <template>
   <v-app>
-    <div
-      ref="draggableContainerSellItem"
-      id="draggable-container-sellitem"
-      class="pa-0"
-      @click="incrementZindex"
-    >
+    <div  ref="draggableContainerReceiving" id="draggable-container-Receiving"
+      class="pa-0"  @click="incrementZindex">
       <v-card elevation="2" :min-width="1000" v-if="showflag">
-        <div id="draggable-header-sellitem" @mousedown="dragMouseDown">
+        <div id="draggable-header-Receiving" @mousedown="dragMouseDown">
           <v-row>
             <v-col cols="2">
-              <span style="color: white; font-size: 12px"> Sell Items </span>
+              <span style="color: white; font-size: 12px"> Receiving Items </span>
             </v-col>
             <v-spacer> </v-spacer>
             <v-col cols="1" class="text-right">
@@ -28,7 +24,7 @@
                 single-line hide-details>
               </v-text-field>
 
-              <v-data-table height="500px" :headers="headers" :items="this.$store.state.itemselltrans"
+              <v-data-table height="500px" :headers="headers" :items="this.$store.state.itemreceivetrans"
                 item-key="_id"  no-data-text="No Data" :hide-default-footer="true"
                 class="elevation-1 my-0" :search="search"  disable-pagination>
                 <template v-slot:body="{ items }">
@@ -37,10 +33,6 @@
                       :class="{
                         selectedRow: item._id == selectedtrans._id,
                       }">
-                      <!-- <td>{{ String(item.transno).padStart(6, "0") }}</td> -->
-                      <!-- <td>
-                        {{ String(item._id).substring(item._id.length - 6) }}
-                      </td> -->
                       <td>{{ item.client.accountname }}</td>
                     </tr>
                   </tbody>
@@ -53,26 +45,15 @@
               <v-row>
                 <v-col cols="7">
                   <v-row class="mt-4">
-                    <!-- CLIENT -->
-                    <v-col cols="8">
+                    <!-- SUPPLIER -->
+                    <v-col cols="10">
                       <v-autocomplete dense flat light v-model="profselect" v-if="creating"
                         :loading="profloading" :items="profitems"  :search-input.sync="profsearch"
                         cache-items class="caption" hide-no-data  hide-details
-                        label="Client/Customer"  @change="autocompleteselectprofile"
-                      >
+                        label="Supplier"  @change="autocompleteselectprofile" >
                       </v-autocomplete>
-                      <v-text-field v-model="selectedtrans.clientname" dense label="Client/Customer" readonly v-if="!creating">
-                      </v-text-field>
-                    </v-col>
-                    <!-- PRICE CODE -->
-                    <v-col cols="4">
-                      <v-select v-model="pricecode" dense :rules="inputRules" class="caption" v-if="creating"
-                        :items="this.$store.state.pricecodes" label="Price Code"
-                        item-text="pricecodedescrip"  item-value="pricecodedescrip"  @change="pricecodechanged"
-                      >
-                      </v-select>
 
-                      <v-text-field v-model="selectedtrans.pricecode" dense label="Price Code" readonly v-if="!creating">
+                      <v-text-field v-model="selectedtrans.clientname" dense label="Supplier" readonly v-if="!creating">
                       </v-text-field>
                     </v-col>
                   </v-row>
@@ -81,7 +62,7 @@
                     <v-col>
                       <v-card v-if="creating">
                         <v-container>
-                          <v-form v-model="validsale" ref="saleform"
+                          <v-form v-model="validsale" ref="receiveform"
                             lazy-validation >
                             <v-row class="mt-2">
                               <!-- ITEM DESCRIPTION -->
@@ -94,7 +75,7 @@
                               </v-col>
                               <!-- ITEM SIZE -->
                               <v-spacer></v-spacer>
-                              <v-col cols="3" class="py-0 my-0">
+                              <v-col cols="3" class="py-0 ma-0">
                                 <v-select v-model="itemsize" dense :rules="inputRules" :items="localitemsizes"
                                   label="Size"  item-text="itemsize" class="centered-input caption"
                                   item-value="itemsize" @change="selectsize"
@@ -258,14 +239,14 @@ import { mapState, mapMutations } from "vuex";
 import moment from "moment";
 
 export default {
-  name: "SellItemComponent",
+  name: "ReceivingComponent",
   props: ["showflag"],
 
   data: function () {
     return {
       ...mapState([
         "lastzindex",
-        "sellitemssumdata",
+        "Receivingssumdata",
         "vendorslistdata",
         "profileslistdata",
         "profilesarray",
@@ -284,6 +265,7 @@ export default {
       itemselect: null,
       itemloading: false,
       itemitems: [],
+      supplieritems: [],
 
       //item template
       quantity: 1,
@@ -294,9 +276,6 @@ export default {
       totalcostdisplay: "0",
       selecteditem: {},
       totalpieces: 1,
-      pricecode: 1,
-
-      //transaction
 
       itemcounter: 0,
 
@@ -304,15 +283,12 @@ export default {
       selectedtrans: {
         _id: '',
         clientname: '',
-        pricecode: '',
-        status: '',
+		status: '',
       },
       transinfo: {
         transdate: '',
         transstatus: "Posted",
         client: "",
-        totalpieces: 1,
-        totalinventory: 1,
         clientname: "",
         pricecode: "",
 		    status: "Posted",
@@ -421,7 +397,7 @@ export default {
   }, //end of data
 
   methods: {
-    ...mapMutations(["mutateZindex", "updateItemSellTrans"]),
+    ...mapMutations(["mutateZindex", "updateItemReceiveTrans"]),
     tellParentToUpdate() {
       this.$emit("reupdateitemselllist");
     },
@@ -452,18 +428,17 @@ export default {
 		}
 	  else {
         this.snackbar = false;
-        this.transinfo.pricecode = this.pricecode;
-        this.transinfo.transtype = "Selling";
-        // let newtransdate = new Date(this.transinfo.transdate);
-        // this.transinfo.transdate = newtransdate;
+        this.transinfo.pricecode = "Supplier Price";
+        this.transinfo.transtype = "Receiving";
+
         let res = await this.callApi("POST", "/itemselltrans", this.transinfo);
         console.log(res);
         if (res.data.created) {
           this.snackbar = true;
           this.snackbartext = "Transaction Saved!";
           //clear
-          this.$refs.saleform.reset();
-          this.$refs.saleform.resetValidation();
+          this.$refs.receiveform.reset();
+          this.$refs.receiveform.resetValidation();
           this.clearAll();
           //update list
           //this.tellParentToUpdate();
@@ -476,9 +451,10 @@ export default {
     },
 
     async getalltransactions() {
-      let res = await this.callApi("GET", "/itemselltrans/translist");
+      let res = await this.callApi("GET", "/itemselltrans/receivinglist");
+      console.log(res.data);
       if (res.data) {
-        this.updateItemSellTrans(res.data);
+        this.updateItemReceiveTrans(res.data);
       } else {
         console.log("There are no transaction data.");
       }
@@ -520,7 +496,7 @@ export default {
       this.totalcostdisplay = "0";
       this.selecteditem = {};
       this.totalpieces = 1;
-      this.pricecode = 1;
+      this.pricecode = "Supplier Price";
 
       //transaction
       this.itemcounter = 0;
@@ -574,7 +550,7 @@ export default {
 
     addtobasket() {
       //validation first
-      this.validsale = this.$refs.saleform.validate();
+      this.validsale = this.$refs.receiveform.validate();
       if (this.validsale) {
         this.itemcounter++;
         //add new row to transaction items
@@ -584,7 +560,7 @@ export default {
           itemcode: this.selecteditem.itemcode,
           itemdescrip: this.selecteditem.itemdescrip,
           totalpieces: this.totalpieces,
-          totalinventory: this.totalpieces * -1,
+          totalinventory: this.totalpieces,
           quantity: this.quantity,
           itemsize: this.itemsize,
           size: this.itemsize,
@@ -599,15 +575,27 @@ export default {
 
     autocompleteselectprofile(selected) {
       console.log(selected);
-      let found = this.$store.state.profileslistdata.find(function (item,index) {
-        if (item.accountname == selected) return item;
+      let found = this.$store.state.vendorslistdata.find(function (item,index) {
+        if (item.accountname == selected)
+        return item;
       });
 
       if (found) {
         this.transinfo.client = found._id;
-        this.transinfo.pricecode = found.pricecode;
-        this.pricecode = found.pricecode;
+        this.getSupplierItems(found._id);
       }
+    },
+
+    getSupplierItems(supplier_id){
+      console.log('finding items');
+      let newitemsarray = [];
+      this.$store.state.itemslistdata.map(function (item,index) {
+        if (item.supplierprofid == supplier_id){
+          newitemsarray.push(item.itemdescrip);
+        }
+      });
+      this.supplieritems = newitemsarray;
+      console.log(newitemsarray);
     },
 
     autocompleteselectitem(selected) {
@@ -639,28 +627,17 @@ export default {
         this.itemsize = "Piece";
         this.totalpieces = 1;
         //get price
-        this.getpriceeach(founditem._id, this.pricecode);
+        this.getpriceeach(founditem._id);
       }
     },
 
-    // getsizedescription(sizeid){
-    //    let foundsize = this.localitemsizes.find(function(item, index) {
-    //       if(item.itemsizeid == sizeid)
-    //         return item;
-    //   });
-    //   return foundsize.itemsizedescrip
-    // },
-
-    getpriceeach(_id, pricecodeid) {
-      //affected by the client/customer that refers to the Price Code
-      let foundprice = this.$store.state.itemprices.find(function (
-        price,
-        index
-      ) {
-        if (price.item_id == _id && price.pricecode == pricecodeid)
+    getpriceeach(_id) {
+      let foundprice = this.$store.state.itemprices.find(function ( price,index) {
+        console.log(price);
+        if (price.item_id == _id && price.pricecode == "Supplier Price")
           return price;
       });
-
+      console.log(foundprice);
       if (foundprice) {
         this.priceeach = parseFloat(foundprice.price);
       } else {
@@ -703,10 +680,6 @@ export default {
       //re-compute
       this.computeeachcost();
     },
-    pricecodechanged(val) {
-      this.pricecode = val;
-      this.transinfo.pricecode = val;
-    },
 
     increment() {
       if (this.quantity < 999999) {
@@ -723,7 +696,7 @@ export default {
     querySelectionsProf(v) {
       this.profloading = true;
       setTimeout(() => {
-        this.profitems = this.$store.state.profilesarray.filter((e) => {
+        this.profitems = this.$store.state.vendorsarray.filter((e) => {
           return (e || "").toLowerCase().indexOf((v || "").toLowerCase()) > -1;
         });
         this.profloading = false;
@@ -733,7 +706,7 @@ export default {
       this.itemloading = true;
       // Simulated ajax query
       setTimeout(() => {
-        this.itemitems = this.$store.state.itemsarray.filter((e) => {
+        this.itemitems = this.supplieritems.filter((e) => {
           return (e || "").toLowerCase().indexOf((v || "").toLowerCase()) > -1;
         });
         this.itemloading = false;
@@ -759,14 +732,12 @@ export default {
         console.log(res.data);
         let info = res.data;
         this.selectedtrans.clientname = info.client.accountname;
-        this.selectedtrans.pricecode = info.pricecode;
 
         this.transinfo._id = info._id;
         this.transinfo.transdate = moment(info.transdate).format('MM/DD/YYYY');
         this.transinfo.transstatus = info.transstatus;
 
         this.transinfo.clientname = info.client.accountname;
-        this.transinfo.pricecode = info.pricecode;
         this.transinfo.transtotal = info.transtotal;
         this.grandtotaldisplay = this.currencyformat(info.transtotal);
         this.transinfo.transitems = info.transitems;
@@ -781,9 +752,9 @@ export default {
     incrementZindex() {
       //if form is still shown
       if (this.showflag) {
-        document.getElementById("draggable-container-sellitem").style.zIndex =
+        document.getElementById("draggable-container-Receiving").style.zIndex =
           this.$store.state.lastzindex + 1;
-        document.getElementById("draggable-header-sellitem").style.zIndex =
+        document.getElementById("draggable-header-Receiving").style.zIndex =
           this.$store.state.lastzindex + 2;
         this.mutateZindex();
       }
@@ -797,6 +768,7 @@ export default {
       document.onmousemove = this.elementDrag;
       document.onmouseup = this.closeDragElement;
     },
+
     elementDrag: function (event) {
       event.preventDefault();
       this.positions.movementX = this.positions.clientX - event.clientX;
@@ -804,15 +776,16 @@ export default {
       this.positions.clientX = event.clientX;
       this.positions.clientY = event.clientY;
       // set the element's new position:
-      this.$refs.draggableContainerSellItem.style.top =
-        this.$refs.draggableContainerSellItem.offsetTop -
+      this.$refs.draggableContainerReceiving.style.top =
+        this.$refs.draggableContainerReceiving.offsetTop -
         this.positions.movementY +
         "px";
-      this.$refs.draggableContainerSellItem.style.left =
-        this.$refs.draggableContainerSellItem.offsetLeft -
+      this.$refs.draggableContainerReceiving.style.left =
+        this.$refs.draggableContainerReceiving.offsetLeft -
         this.positions.movementX +
         "px";
     },
+
     closeDragElement() {
       document.onmouseup = null;
       document.onmousemove = null;
@@ -873,9 +846,7 @@ export default {
       if (parseFloat(this.totalcost) > 0)
         this.totalcostdisplay = this.currencyformat(this.totalcost);
     },
-    pricecode: function () {
-      this.getpriceeach(this.selecteditem._id, this.pricecode);
-    },
+
   },
 }; //end of export default
 </script>

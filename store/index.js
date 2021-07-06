@@ -4,6 +4,8 @@ export const state = () => ({
   counter: 123,
   profileslistdata: [],
   profilesarray: [],
+  vendorslistdata: [],
+  vendorsarray: [],
 
   genders: [],
   civilstats: [],
@@ -19,7 +21,8 @@ export const state = () => ({
   itemprices: [],
   itempricing: [],
   itemselltrans: [],
-  vendorslistdata: [],
+  itemreceivetrans: [],
+
   profiletypedata: [],
   sellitemssumdata: [],
   lastzindex: 11,
@@ -67,10 +70,16 @@ export const mutations = {
   updateItemSellTrans(state, newlist){
     state.itemselltrans = newlist
   },
+  updateItemReceiveTrans(state, newlist){
+    state.itemreceivetrans = newlist
+  },
 
   //vendors
   updateVendorList(state, newlist){
     state.vendorslistdata = newlist
+  },
+  updateVendorArray(state, newlist){
+    state.vendorsarray = newlist
   },
 
   //taggings
@@ -88,6 +97,9 @@ export const mutations = {
   },
   updatePriceCode(state, newlist){
     state.pricecodes = newlist
+  },
+  updateItemReceiveTrans(state, newlist){
+    state.itemreceivetrans = newlist
   },
 
 

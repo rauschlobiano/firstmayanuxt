@@ -58,7 +58,7 @@ input::placeholder {
   padding-left: 10px;
   padding-top: 5px;
   padding-bottom: 5px;
-  background-color: rgb(31, 100, 57);
+  background-color: rgb(156, 68, 87);
 }
 
 #draggable-container-item {
@@ -96,4 +96,16 @@ input::placeholder {
   padding-top: 5px;
   padding-bottom: 5px;
   background-color: rgb(173, 127, 42);
+}
+#draggable-container-Receiving {
+  position: absolute;
+  z-index: 9;
+  width: 600px;
+}
+#draggable-header-Receiving {
+  z-index: 10;
+  padding-left: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background-color: rgb(31, 128, 119);
 }
