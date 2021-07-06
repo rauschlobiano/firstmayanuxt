@@ -21,7 +21,12 @@ export class ItemselltransServices {
 
   async getalltransactionslist() {
     return await this.model
-      .find({}, { transno: 1, client: 1 })
+      .find({ transtype: "Selling" }, { transno: 1, client: 1 })
+      .populate([{ path: "client" }]);
+  }
+  async getallreceivingtransactionslist() {
+    return await this.model
+      .find({ transtype: "Receiving" }, { transno: 1, client: 1 })
       .populate([{ path: "client" }]);
   }
 
@@ -55,13 +60,17 @@ export class ItemselltransServices {
       .populate([{ path: "transitems" }, { path: "client" }]);
   }
 
-  async savetransaction(body: { transitems: { [x: string]: string }[] }) {
+  async savetransaction(body: {
+    transitems: { [x: string]: string }[];
+    transdate: any;
+  }) {
     try {
       //create the transitems first
       const { transitems, ...data } = body;
       const promises = Promise.all(
         transitems.map(async (item) => {
           delete item._id;
+          item.transdate = body.transdate;
           const modelitem = await this.modelitem.create(item);
           return modelitem._id;
         })

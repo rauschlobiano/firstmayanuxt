@@ -22,6 +22,10 @@ export class ItemselltransController {
   async readItemselltranslist(): Promise<any> {
     return await this.services.getalltransactionslist();
   }
+  @Get("/receivinglist")
+  async readItemreceivetranslist(): Promise<any> {
+    return await this.services.getallreceivingtransactionslist();
+  }
   @Post("/reporttrans")
   async reporttranslist({ body }: MayaJsContext): Promise<any> {
     return await this.services.getallreporttrans(body);

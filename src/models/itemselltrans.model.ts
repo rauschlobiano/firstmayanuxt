@@ -10,6 +10,9 @@ export default {
       transdate: {
         type: Date,
       },
+      transtype: {
+        type: String,
+      },
       transstatus: {
         type: String,
       },

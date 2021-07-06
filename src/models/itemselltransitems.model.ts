@@ -10,10 +10,16 @@ export default {
       itemcode: {
         type: String,
       },
+      transdate: {
+        type: Date,
+      },
       itemdescrip: {
         type: String,
       },
       totalpieces: {
+        type: Number,
+      },
+      totalinventory: {
         type: Number,
       },
       quantity: {

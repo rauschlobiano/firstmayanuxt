@@ -3,24 +3,29 @@ import { MongoDbServices } from "@mayajs/mongo";
 
 @Service()
 export class IteminventoryServices {
-  get model() {
-    const db = this.mongo.database("con1");
-    return db.instance.model("ItemSellTransItem");
+  get db() {
+    return this.mongo.database("con1");
+  }
+  get transItems() {
+    return this.db.instance.model("ItemSellTransItem");
   }
   constructor(private mongo: MongoDbServices) {}
 
   //returns all items
-  async getAllItemInventory(body: {}) {
-    console.log(body);
-    let maxdate = {};
-    return await this.model.aggregate([
+  async getAllItemInventory() {
+    return await this.transItems.aggregate([
       {
         $group: {
           _id: "$itemcode",
           itemdescrip: { $first: "$itemdescrip" },
-          totalpieces: { $sum: "$totalpieces" },
+          totalpieces: { $sum: "$totalinventory" },
         },
       },
+      { $sort: { itemdescrip: 1 } },
     ]);
+  }
+  //get history of an item
+  async getItemHistory(params: {}) {
+    return await this.transItems.find(params);
   }
 }
