@@ -58,7 +58,7 @@ input::placeholder {
   padding-left: 10px;
   padding-top: 5px;
   padding-bottom: 5px;
-  background-color: rgb(65, 67, 160);
+  background-color: rgb(31, 100, 57);
 }
 
 #draggable-container-item {
@@ -83,5 +83,17 @@ input::placeholder {
   padding-left: 10px;
   padding-top: 5px;
   padding-bottom: 5px;
-  background-color: rgb(112, 36, 36);
+  background-color: rgb(156, 28, 99);
+}
+#draggable-container-Inventory {
+  position: absolute;
+  z-index: 9;
+  width: 600px;
+}
+#draggable-header-Inventory {
+  z-index: 10;
+  padding-left: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background-color: rgb(173, 127, 42);
 }

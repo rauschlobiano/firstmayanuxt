@@ -25,7 +25,7 @@
 
           <v-row>
             <v-col cols="3">
-              <v-select v-model="selectedReportType" dense class="caption"
+              <v-select v-model="selectedReportType" dense class="caption" item-text="reporttypedescrip"  item-value="reporttypeid"
                 :items="reportTypes" label="Report Type" @change="reportTypeChanged"
               >
               </v-select>
@@ -56,15 +56,16 @@
                   </v-row>
                   <v-row dense>
                     <v-col>
-                      <span class="reportname" > {{ reportName }} </span>
+                      <span class="reportname" > {{ reportName }} </span> <br>
+                      <span class="subtitle"> As of {{ filters.dateFrom }} - {{ filters.dateTo}} </span>
                     </v-col>
                   </v-row>
 
                     <hr>
                     <v-row>
                       <v-col>
-                        <v-data-table dense :headers="headers" :items="tableData" item-key="name"  class="arial elevation-1"
-                        :hide-default-footer="true">
+                        <v-data-table dense :headers="headers" :items="tableData" item-key="name"
+                         class="arial elevation-1"  :hide-default-footer="true" disable-pagination>
                         </v-data-table>
                       </v-col>
                     </v-row>
@@ -99,8 +100,11 @@
 
     data: function () {
       return {
-        reportTypes: ['Item Sales'],
-        selectedReportType: '',
+        reportTypes: [
+          {reporttypeid: 1, reporttypedescrip: 'Total Item Sales'},
+          {reporttypeid: 2, reporttypedescrip: 'Sales Per Item'}
+        ],
+        selectedReportType: 1,
         filters: {
           dateFrom: '',
           dateTo: '',
@@ -109,7 +113,7 @@
         output: null,
         companyName: "The Full Name of Company",
         subTitle: "Company complete address and contact number 123123123",
-        reportName: "Name of Report",
+        reportName: "Total Item Sales",
         dateTime: "Header",
         snackbar: false,
         snackbartext: "",
@@ -147,27 +151,88 @@
         //validate filters
         if(!this.validateDate(this.filters.dateFrom)){
           this.snackbar = true;
-				  this.snackbartext = "Invalid Date From";
+				  this.snackbartext = "Invalid Date-From";
         }
         else if(!this.validateDate(this.filters.dateTo)){
           this.snackbar = true;
-				  this.snackbartext = "Invalid Date To";
+				  this.snackbartext = "Invalid Date-To";
         }
         else
         {
           console.log('Getting report data...');
-          let res = await this.callApi("POST", "/itemselltrans/reporttrans", {filters: this.filters});
-          if (res.data) {
-            console.log(res.data);
-            this.tableData = res.data;
-            //get the totals
-            res.data.forEach(trans => {
-              this.grandTotal += Number(trans.transtotal);
-            });
-            //add the total to the last row
-            this.tableData.push({transtotal: this.grandTotal});
-          } else {
-            console.log("There are no transactions.");
+          //getting the type of report
+          if(this.selectedReportType == 1){
+            //Total Item Sales
+            let res = await this.callApi("POST", "/itemselltrans/reporttrans", {filters: this.filters});
+            if (res.data) {
+              //format the headers
+              this.headers = [
+                { text: 'Client', value: 'client.accountname',},
+                { text: 'Price Code', value: 'pricecode' },
+                { text: 'Status', value: 'transstatus' },
+                { text: 'Date', value: 'transdate' },
+                { text: 'Total', value: 'transtotal', align: "right", },
+              ],
+              //format the tableData
+              this.tableData = res.data;
+              //get the totals
+              res.data.forEach(trans => {
+                this.grandTotal += Number(trans.transtotal);
+                trans.transtotal = this.commaSeparate(parseFloat(trans.transtotal).toFixed(2));
+                trans.transdate = moment(trans.transdate).format('MM/DD/YYYY');
+              });
+              //add the total to the last row
+              this.tableData.push({transtotal: this.currencyformat(this.grandTotal) });
+            }
+            else
+            {
+              console.log("There are no transactions.");
+            }
+          }
+          else if(this.selectedReportType == 2){
+            //change the headers
+            //change the tabledata
+            //Total Item Sales
+            let res = await this.callApi("POST", "/itemselltrans/salesperitem", {filters: this.filters});
+            if (res.data) {
+              console.log(res.data);
+              //format the headers
+              this.headers = [
+                { text: 'Date', value: 'transdate' },
+                { text: 'Code', value: 'itemcode',},
+                { text: 'Item Description', value: 'itemdescrip',},
+                { text: 'Price Code', value: 'pricecode' },
+                { text: 'Pieces', value: 'totalpieces' },
+                { text: 'Size', value: 'size' },
+                { text: 'Quantity', value: 'quantity' },
+                { text: 'Price Each', value: 'priceeach' },
+                { text: 'Total', value: 'totalcost', align: "right", },
+              ],
+              //format the tableData
+              this.tableData = [];
+              res.data.forEach(trans => {
+                //get the all items in each trans
+                if(trans.transitems){
+                  trans.transitems.forEach(item => {
+                    //compute total
+                    this.grandTotal += Number(item.totalcost);
+
+                    item.transdate =  moment(trans.transdate).format('MM/DD/YYYY');
+                    item.pricecode = trans.pricecode
+                    item.priceeach = this.commaSeparate(parseFloat(item.priceeach).toFixed(2));
+                    item.totalcost = this.commaSeparate(parseFloat(item.totalcost).toFixed(2));
+                    this.tableData.push(item);
+
+                  })
+                }
+              });
+              //add the total to the last row
+              this.tableData.push({totalcost: this.currencyformat(this.grandTotal) });
+            }
+            else {
+              console.log("There are no transactions.");
+            }
+
           }
         }
       },
@@ -180,6 +245,8 @@
       },
       reportTypeChanged(val) {
         console.log(val);
+        let selectedreport = this.reportTypes.find(x => x.reporttypeid == val);
+        this.reportName = selectedreport.reporttypedescrip;
       },
       incrementZindex() {
         //if form is still shown
@@ -219,10 +286,21 @@
         document.onmouseup = null;
         document.onmousemove = null;
       },
+      currencyformat(amt) {
+        return new Intl.NumberFormat("en", {
+          currency: "Php",
+          style: "currency",
+        }).format(amt);
+      },
+      commaSeparate(x){
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      }
 
     },
     created() {
-      this.filters.dateFrom = moment().format('MM/DD/YYYY');
+      let today = new Date();
+      let firstday = new Date(today.getFullYear(),today.getMonth(),1);
+      this.filters.dateFrom = moment(firstday).format('MM/DD/YYYY');
       this.filters.dateTo = moment().format('MM/DD/YYYY');
 
     }

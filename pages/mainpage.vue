@@ -39,6 +39,17 @@
         </template>
         <span>Reports</span>
       </v-tooltip>
+
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn @click="clickInventory" icon v-bind="attrs"  v-on="on">
+            <v-icon>mdi-truck-delivery</v-icon>
+          </v-btn>
+        </template>
+        <span>Inventory</span>
+      </v-tooltip>
+
+
     </v-app-bar>
     <v-main>
       <v-row>
@@ -71,11 +82,18 @@
         </div>
 
         <div data-app>
-          <ReportViewerComponent
-            :showflag="showhidereportviewer"
+          <ReportViewerComponent :showflag="showhidereportviewer"
             @formclose="closeFromReportViewer"
           >
           </ReportViewerComponent>
+        </div>
+
+        <div data-app>
+          <InventoryComponent
+            :showflag="showhideinventory"
+            @formclose="closeFromInventory"
+          >
+          </InventoryComponent>
         </div>
 
         <v-card
@@ -107,12 +125,12 @@ import ProfileComponent from "~/components/ProfileComponent";
 import ItemComponent from "~/components/ItemComponent";
 import SellItemComponent from "~/components/SellItemComponent";
 import ReportViewerComponent from "~/components/ReportViewerComponent";
+import InventoryComponent from "~/components/InventoryComponent";
 
 export default {
   components: {
-    ProfileComponent,
-    ItemComponent,
-    SellItemComponent,ReportViewerComponent
+    ProfileComponent, ItemComponent,
+    SellItemComponent,ReportViewerComponent,InventoryComponent
   },
   data: function () {
     return {
@@ -121,6 +139,7 @@ export default {
       showhideitem: false,
       showhidesellitem: false,
       showhidereportviewer: false,
+      showhideinventory: false,
       connected: true,
       reconnecting: false,
       remainingtime: 10,
@@ -160,6 +179,10 @@ export default {
       //this.$store.dispatch('actionShowHideProfile')
       this.showhidereportviewer = !this.showhidereportviewer;
     },
+    clickInventory() {
+      //this.$store.dispatch('actionShowHideProfile')
+      this.showhideinventory = !this.showhideinventory;
+    },
     closeFromProfile(showhide) {
       this.showhideprof = showhide;
     },
@@ -171,6 +194,9 @@ export default {
     },
     closeFromReportViewer(showhide) {
       this.showhidereportviewer = showhide;
+    },
+    closeFromInventory(showhide) {
+      this.showhideinventory = showhide;
     },
     //profiles
     async getallprofiles(state) {

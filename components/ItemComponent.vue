@@ -43,7 +43,10 @@
                 :headers="headers"
                 :items="this.$store.state.itemslistdata"
                 item-key="iteminfoid"
-                :items-per-page="15"
+                :items-per-page="50"
+                :footer-props="{
+                  'items-per-page-options': [15, 30, 50, 75, 100, -1]
+                }"
                 class="elevation-1 my-0"
                 :search="search"
               >
@@ -54,7 +57,7 @@
                       :key="item._id"
                       @click="selectItem(item)"
                       :class="{
-                        selectedRow: item.itemcode == iteminfo.itemcode,
+                        selectedRow: item._id == iteminfo._id,
                       }"
                     >
                       <td>{{ item.itemdescrip }}</td>
@@ -115,7 +118,7 @@
                       <v-switch
                         v-model="iteminfo.active"
                         flat
-                        :label="`Active: ${iteminfo.active.toString()}`"
+                        :label="`Active: ${iteminfo.active}`"
                         dense
                         @change="changetrigger"
                       ></v-switch>
@@ -460,6 +463,7 @@ export default {
         pieces: 0,
       },
       iteminfo: {
+        _id: "",
         iteminfoid: "",
         itemcode: "",
         itemdescrip: "",
@@ -542,7 +546,7 @@ export default {
     async saveitem() {
       if (this.creating) {
         this.valid = this.$refs.form.validate();
-
+        delete this.iteminfo._id;
         if (this.valid) {
           try {
             let res = await this.callApi("post", "/items", this.iteminfo);
@@ -803,6 +807,7 @@ export default {
       this.cleanform();
       this.$refs.form.reset();
       this.$refs.form.resetValidation();
+      this.iteminfo.active = true;
     },
 
     cleanform() {

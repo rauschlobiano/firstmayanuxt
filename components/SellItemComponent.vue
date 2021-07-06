@@ -21,7 +21,7 @@
             </v-col>
           </v-row>
         </div>
-        <v-container>
+        <div class="ma-2">
           <v-row>
             <v-col cols="3">
               <v-text-field dense v-model="search"  append-icon="mdi-magnify"  label="Search"
@@ -29,8 +29,8 @@
               </v-text-field>
 
               <v-data-table height="500px" :headers="headers" :items="this.$store.state.itemselltrans"
-                item-key="_id"  no-data-text="No Data" :hide-default-header="true" :hide-default-footer="true"
-                class="elevation-1 my-0" :search="search">
+                item-key="_id"  no-data-text="No Data" :hide-default-footer="true"
+                class="elevation-1 my-0" :search="search"  disable-pagination>
                 <template v-slot:body="{ items }">
                   <tbody>
                     <tr v-for="item in items" :key="item._id" @click="selectItem(item)"
@@ -38,19 +38,20 @@
                         selectedRow: item._id == selectedtrans._id,
                       }">
                       <!-- <td>{{ String(item.transno).padStart(6, "0") }}</td> -->
-                      <td>
+                      <!-- <td>
                         {{ String(item._id).substring(item._id.length - 6) }}
-                      </td>
+                      </td> -->
                       <td>{{ item.client.accountname }}</td>
                     </tr>
                   </tbody>
                 </template>
               </v-data-table>
+
             </v-col>
 
             <v-col cols="9">
               <v-row>
-                <v-col cols="8">
+                <v-col cols="7">
                   <v-row class="mt-4">
                     <!-- CLIENT -->
                     <v-col cols="8">
@@ -138,7 +139,7 @@
                   </v-row>
                 </v-col>
 
-                <v-col cols="4">
+                <v-col cols="5">
                   <v-row>
                     <v-col>
                       <div class="text-right mb-3">
@@ -177,7 +178,7 @@
                                 {{ transinfo.status }}
                               </td>
                             </tr>
-                            <tr style="height: 35px; background-color: lightblue" class="mt-2">
+                            <tr style="height: 35px; background-color: honeydew" class="mt-2">
                               <td>Total :</td>
                               <td  class="font-weight-bold" style="font-size: 20px; color: darkgreen">
                                 {{ grandtotaldisplay }}
@@ -204,6 +205,22 @@
                   <v-data-table
                     height="200px" :headers="transitemsheader"  :items="transinfo.transitems" item-key="itemcounter" no-data-text="No Items"
                     :hide-default-footer="true" class="elevation-1 my-0">
+                    <template v-slot:item="row">
+                        <tr>
+                          <td>
+                              <v-btn class="caption" text light x-small v-if="creating"
+                                @click="removeItem(row.item)">
+                                <v-icon color="green">mdi-delete-outline</v-icon>
+                              </v-btn>
+                          </td>
+                          <td>{{row.item.itemcode}}</td>
+                          <td>{{row.item.itemdescrip}}</td>
+                          <td>{{row.item.quantity}}</td>
+                          <td>{{row.item.size}}</td>
+                          <td>{{row.item.priceeachdisplay}}</td>
+                          <td>{{row.item.totalcostdisplay}}</td>
+                        </tr>
+                    </template>
                   </v-data-table>
                 </v-col>
               </v-row>
@@ -222,7 +239,7 @@
               </v-row>
             </v-col>
           </v-row>
-        </v-container>
+        </div>
       </v-card>
       <v-snackbar v-model="snackbar">
         {{ snackbartext }}
@@ -248,7 +265,6 @@ export default {
     return {
       ...mapState([
         "lastzindex",
-        "itemslistdata",
         "sellitemssumdata",
         "vendorslistdata",
         "profileslistdata",
@@ -316,26 +332,34 @@ export default {
 	  ],
 
       headers: [
-        { text: "TransID", align: "center", value: "_id" },
-        { text: "Client/Customer", align: "start", value: "client.accountname" },
+        // { text: "TransID", align: "center", value: "_id" },
+        { text: "Transactions", align: "start", value: "client.accountname" },
       ],
       transitemsheader: [
         {
-          text: "Count",
-          align: "",
-          value: "itemcounter",
-          class: "dtheaderbg",
+          text: "",
+          value: "x",
           sortable: false,
-          width: "20px",
+          width: "5%",
           fixed: true,
-        },
+          class: 'dtheaderbg',
+          align: 'center'},
+        // {
+        //   text: "Count",
+        //   align: "",
+        //   value: "itemcounter",
+        //   class: "dtheaderbg",
+        //   sortable: false,
+        //   width: "20px",
+        //   fixed: true,
+        // },
         {
           text: "Code",
           align: "center",
           value: "itemcode",
           class: "dtheaderbg",
           sortable: false,
-          width: "80px",
+          width: "8%",
           fixed: true,
         },
         {
@@ -344,7 +368,7 @@ export default {
           value: "itemdescrip",
           class: "dtheaderbg",
           sortable: false,
-          width: "200px",
+          width: "20%",
           fixed: true,
         },
         {
@@ -353,7 +377,7 @@ export default {
           value: "quantity",
           class: "dtheaderbg",
           sortable: false,
-          width: "60px",
+          width: "7%",
           fixed: true,
         },
         {
@@ -362,7 +386,7 @@ export default {
           value: "size",
           class: "dtheaderbg",
           sortable: false,
-          width: "60px",
+          width: "10%",
           fixed: true,
         },
         {
@@ -371,7 +395,7 @@ export default {
           value: "priceeachdisplay",
           class: "dtheaderbg",
           sortable: false,
-          width: "50px",
+          width: "12%",
           fixed: true,
         },
         {
@@ -380,7 +404,7 @@ export default {
           value: "totalcostdisplay",
           class: "dtheaderbg",
           sortable: false,
-          width: "50px",
+          width: "15%",
           fixed: true,
         },
       ],
@@ -399,6 +423,14 @@ export default {
     tellParentToUpdate() {
       this.$emit("reupdateitemselllist");
     },
+    removeItem(item){
+      console.log(item);
+      this.transinfo.transitems = this.transinfo.transitems.filter(function(i) {
+        return i.itemcounter != item.itemcounter;
+      })
+      console.log(this.transinfo.transitems);
+
+    },
     async savetransaction() {
       //can't do form validation here because there's another form in the middle
       //doing manual validation
@@ -414,7 +446,7 @@ export default {
 		else if(!this.validateDate(this.transinfo.transdate)){
 			this.snackbar = true;
         this.snackbartext =
-          "There is no transaction to save based on the Totals";
+          "Date is not valid.";
 		}
 	  else {
         this.snackbar = false;
@@ -494,12 +526,12 @@ export default {
       this.grandtotaldisplay = "0.0";
 
 
-	this.transinfo.client = "";
-	this.transinfo.clientname = "";
+      this.transinfo.client = "";
+      this.transinfo.clientname = "";
 
-	this.transinfo.transtotal = 0;
-	this.transinfo.transitems = [];
-	this.transinfo.notes = "";
+      this.transinfo.transtotal = 0;
+      this.transinfo.transitems = [];
+      this.transinfo.notes = "";
 
       this.validsale = false;
       this.valid = false;
@@ -525,6 +557,10 @@ export default {
         style: "currency",
       }).format(this.transinfo.transtotal);
     },
+
+     commaSeparate(x){
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      },
 
     currencyformat(amt) {
       return new Intl.NumberFormat("en", {
@@ -628,11 +664,23 @@ export default {
       }
     },
 
+    gettotalpieces(qty){
+      //get the totalpieces
+      // let foundsize = this.localitemsizes.find(function (item, index) {
+      //   if (item.itemsize == this.itemsize) return item;
+      // });
+      let foundsize = this.localitemsizes.find(x => x.itemsize === this.itemsize)
+      if(foundsize){
+        this.totalpieces = parseFloat(foundsize.pieces) * qty;
+      }
+
+      console.log(this.totalpieces);
+
+      this.computeeachcost();
+    },
+
     computeeachcost() {
-      this.totalcost =
-        parseFloat(this.quantity) *
-        parseFloat(this.totalpieces) *
-        parseFloat(this.priceeach);
+      this.totalcost = Number(this.totalpieces) * Number(this.priceeach);
     },
 
     selectsize(size) {
@@ -642,11 +690,14 @@ export default {
       });
       if (foundsize) {
         this.itemsize = size;
-        this.totalpieces = foundsize.pieces;
+        this.totalpieces = foundsize.pieces * this.quantity;
       } else {
         this.itemsize = "Piece";
         this.totalpieces = 1;
       }
+
+      //re-compute
+      this.computeeachcost();
     },
     pricecodechanged(val) {
       this.pricecode = val;
@@ -771,9 +822,15 @@ export default {
     itemsizepieces(val) {
       return this.$store.state.itemsizepieces;
     },
+    itemslistdata(val) {
+      return this.$store.state.itemslistdata;
+    },
   },
 
   watch: {
+    itemslistdata(val){
+      console.log("item list is updated! - from watch");
+    },
     itemsizepieces(val) {
       console.log("itemsizepieces is updated! - from watch");
       //just clear-out the selected item if someone is currently trying add a new transaction
@@ -801,7 +858,7 @@ export default {
       this.computeeachcost();
     },
     quantity: function (val) {
-      this.computeeachcost();
+      this.gettotalpieces(val);
     },
     priceeach: function () {
       if (parseFloat(this.priceeach) > 0)
