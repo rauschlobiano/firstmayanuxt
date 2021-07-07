@@ -18,7 +18,7 @@ export class AppController {
   @Get()
   async readApp(): Promise<any> {
     // Read all App list
-    return { message: "From AppController GET route" };
+    return "This means war!";
   }
 
   @Get("/:id")
