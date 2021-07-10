@@ -1,4 +1,5 @@
 import { IteminventoryController } from "./controllers/iteminventory.controller";
+import { ItemlocationsController } from "./controllers/itemlocations.controller";
 import { ItempricesController } from "./controllers/itemprices.controller";
 import { ItemsController } from "./controllers/items.controller";
 import { ItemselltransController } from "./controllers/itemselltrans.controller";
@@ -39,5 +40,9 @@ export const routes = [
   {
     path: "iteminventory",
     controller: IteminventoryController,
+  },
+  {
+    path: "itemlocations",
+    controller: ItemlocationsController,
   },
 ];

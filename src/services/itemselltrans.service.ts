@@ -19,6 +19,23 @@ export class ItemselltransServices {
     return await this.model.find({});
   }
 
+  async getitemsbylocation(params: {}) {
+    console.log(params);
+    // return await this.modelitem.find(params).populate([{ path: "transitems" }]);
+    return await this.modelitem.aggregate([
+      { $match: params },
+      {
+        $group: {
+          _id: "$item_id",
+          itemdescrip: { $first: "$itemdescrip" },
+          itemcode: { $first: "$itemcode" },
+          totalpieces: { $sum: "$totalinventory" },
+        },
+      },
+      { $sort: { itemdescrip: 1 } },
+    ]);
+  }
+
   async getalltransactionslist() {
     return await this.model
       .find({ transtype: "Selling" }, { transno: 1, client: 1 })
@@ -31,13 +48,28 @@ export class ItemselltransServices {
   }
 
   async getallreporttrans(body: { filters: { dateFrom: ""; dateTo: "" } }) {
-    //reformat date
+    //report for all selling transaction based on date
     let datefrom = new Date(body.filters.dateFrom);
     let dateto = new Date(body.filters.dateTo);
 
     return await this.model
       .find({
         transdate: { $gte: datefrom, $lte: dateto },
+        transtype: "Selling",
+      })
+      .populate([{ path: "transitems" }, { path: "client" }]);
+  }
+  async getallreporttransreceived(body: {
+    filters: { dateFrom: ""; dateTo: "" };
+  }) {
+    //report for all selling transaction based on date
+    let datefrom = new Date(body.filters.dateFrom);
+    let dateto = new Date(body.filters.dateTo);
+
+    return await this.model
+      .find({
+        transdate: { $gte: datefrom, $lte: dateto },
+        transtype: "Receiving",
       })
       .populate([{ path: "transitems" }, { path: "client" }]);
   }
@@ -48,7 +80,21 @@ export class ItemselltransServices {
 
     return await this.model
       .find(
-        { transdate: { $gt: datefrom, $lt: dateto } },
+        { transdate: { $gt: datefrom, $lt: dateto }, transtype: "Selling" },
+        { transdate: 1, transitems: 1, pricecode: 1, transtotal: 1 }
+      )
+      .populate([{ path: "transitems" }]);
+  }
+  async getallreportitemreceived(body: {
+    filters: { dateFrom: ""; dateTo: "" };
+  }) {
+    //reformat date
+    let datefrom = new Date(body.filters.dateFrom);
+    let dateto = new Date(body.filters.dateTo);
+
+    return await this.model
+      .find(
+        { transdate: { $gt: datefrom, $lt: dateto }, transtype: "Receiving" },
         { transdate: 1, transitems: 1, pricecode: 1, transtotal: 1 }
       )
       .populate([{ path: "transitems" }]);

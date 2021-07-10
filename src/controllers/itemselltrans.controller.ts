@@ -22,6 +22,10 @@ export class ItemselltransController {
   async readItemselltranslist(): Promise<any> {
     return await this.services.getalltransactionslist();
   }
+  @Get("/itemsbylocation/:itemlocation")
+  async getitemsbylocation({ params }: MayaJsContext): Promise<any> {
+    return await this.services.getitemsbylocation(params);
+  }
   @Get("/receivinglist")
   async readItemreceivetranslist(): Promise<any> {
     return await this.services.getallreceivingtransactionslist();
@@ -30,9 +34,17 @@ export class ItemselltransController {
   async reporttranslist({ body }: MayaJsContext): Promise<any> {
     return await this.services.getallreporttrans(body);
   }
+  @Post("/reporttransreceived")
+  async reporttranslistreceived({ body }: MayaJsContext): Promise<any> {
+    return await this.services.getallreporttransreceived(body);
+  }
   @Post("/salesperitem")
   async reportsalesperitem({ body }: MayaJsContext): Promise<any> {
     return await this.services.getallreportitemsales(body);
+  }
+  @Post("/receivedperitem")
+  async reportreceivedperitem({ body }: MayaJsContext): Promise<any> {
+    return await this.services.getallreportitemreceived(body);
   }
 
   @Get("/:id")

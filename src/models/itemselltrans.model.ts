@@ -13,6 +13,9 @@ export default {
       transtype: {
         type: String,
       },
+      itemlocation: {
+        type: String,
+      },
       transstatus: {
         type: String,
       },

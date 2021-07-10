@@ -4,6 +4,9 @@ export default {
   name: "ItemSellTransItem",
   schema: new Schema(
     {
+      item_id: {
+        type: String,
+      },
       itemcounter: {
         type: Number,
       },
@@ -12,6 +15,9 @@ export default {
       },
       transdate: {
         type: Date,
+      },
+      itemlocation: {
+        type: String,
       },
       itemdescrip: {
         type: String,
