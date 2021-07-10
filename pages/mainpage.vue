@@ -32,6 +32,17 @@
         <span>Receiving</span>
       </v-tooltip>
 
+
+      <v-tooltip bottom style="z-index: 1000;">
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn @click="clickItemTransfer" icon v-bind="attrs"  v-on="on">
+            <v-icon>mdi-transfer</v-icon>
+          </v-btn>
+        </template>
+        <span>Transfers</span>
+      </v-tooltip>
+
+
       <v-tooltip bottom style="z-index: 1000;">
         <template v-slot:activator="{ on, attrs }">
           <v-btn @click="clickSellItem" icon v-bind="attrs"  v-on="on">
@@ -58,7 +69,6 @@
         </template>
         <span>Reports</span>
       </v-tooltip>
-
 
 
     </v-app-bar>
@@ -115,6 +125,14 @@
           </ReceivingComponent>
         </div>
 
+        <div data-app>
+          <ItemTransferComponent
+            :showflag="showhideitemtransfer"
+            @formclose="closeFromItemTransfer"
+          >
+          </ItemTransferComponent>
+        </div>
+
         <v-card
           class="mx-auto mt-10"
           height="120"
@@ -146,11 +164,13 @@ import SellItemComponent from "~/components/SellItemComponent";
 import ReportViewerComponent from "~/components/ReportViewerComponent";
 import InventoryComponent from "~/components/InventoryComponent";
 import ReceivingComponent from "~/components/ReceivingComponent";
+import ItemTransferComponent from "~/components/ItemTransferComponent";
 
 export default {
   components: {
     ProfileComponent, ItemComponent,
-    SellItemComponent,ReportViewerComponent,InventoryComponent,ReceivingComponent
+    SellItemComponent,ReportViewerComponent,InventoryComponent,
+    ReceivingComponent, ItemTransferComponent
   },
   data: function () {
     return {
@@ -161,6 +181,7 @@ export default {
       showhidereportviewer: false,
       showhideinventory: false,
       showhideinventoryin: false,
+      showhideitemtransfer: false,
       connected: true,
       reconnecting: false,
       remainingtime: 10,
@@ -185,6 +206,7 @@ export default {
       "updateGenderList",
       "updateAccountStatsList",
       "updateProfGroupList",
+      "updateItemLocations",
     ]),
     clickProfile() {
       this.showhideprof = !this.showhideprof;
@@ -207,6 +229,9 @@ export default {
     clickInventoryIn() {
       this.showhideinventoryin = !this.showhideinventoryin;
     },
+    clickItemTransfer() {
+      this.showhideitemtransfer = !this.showhideitemtransfer;
+    },
     closeFromProfile(showhide) {
       this.showhideprof = showhide;
     },
@@ -224,6 +249,9 @@ export default {
     },
     closeFromInventoryIn(showhide) {
       this.showhideinventoryin = showhide;
+    },
+    closeFromItemTransfer(showhide) {
+      this.showhideitemtransfer = showhide;
     },
     //profiles
     async getallprofiles(state) {
@@ -250,6 +278,18 @@ export default {
         itemarray.push(element.itemdescrip);
       });
       this.updateItemArray(itemarray);
+    },
+    async getallitemlocations(state) {
+      console.log("getting all items locations");
+      let res = await this.callApi("get", "/itemlocations");
+        console.log(res.data);
+      this.updateItemLocations(res.data);
+
+      // let itemarray = [];
+      // res.data.forEach((element) => {
+      //   itemarray.push(element.itemdescrip);
+      // });
+      // this.updateItemArray(itemarray);
     },
     async getallitemsizes(state) {
       console.log("getting all item sizes");
@@ -380,6 +420,7 @@ export default {
 
       this.getallitemsizepieces();
       this.getallitemprices();
+      this.getallitemlocations();
     }
   },
 };

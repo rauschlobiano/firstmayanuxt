@@ -15,6 +15,8 @@ export default {
     ]
   },
 
+  target: "static",
+
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
     '~assets/main.css',
@@ -41,6 +43,7 @@ export default {
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/vuetify',
     '@nuxtjs/axios',
+    '@nuxtjs/dotenv',
   ],
 
   vuetify: {
@@ -50,7 +53,7 @@ export default {
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
-    baseURL: 'http://127.0.0.1:3333'
+    baseURL:  "http://localhost:3333" || process.env.API_CONN
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build

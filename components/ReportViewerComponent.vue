@@ -4,7 +4,7 @@
       class="pa-0"
       @click="incrementZindex"
     >
-      <v-card elevation="2" min-width="900" height="700" v-if="showflag">
+      <v-card elevation="2" min-width="900" height="760" v-if="showflag">
         <div id="draggable-header-reportviewer" @mousedown="dragMouseDown">
           <v-row>
             <v-col cols="2">
@@ -102,7 +102,9 @@
       return {
         reportTypes: [
           {reporttypeid: 1, reporttypedescrip: 'Total Item Sales'},
-          {reporttypeid: 2, reporttypedescrip: 'Sales Per Item'}
+          {reporttypeid: 2, reporttypedescrip: 'Sales Per Item'},
+          {reporttypeid: 3, reporttypedescrip: 'Receiving Transactions'},
+          {reporttypeid: 4, reporttypedescrip: 'Received Items'},
         ],
         selectedReportType: 1,
         filters: {
@@ -176,6 +178,36 @@
               //format the tableData
               this.tableData = res.data;
               //get the totals
+               this.grandTotal = 0;
+              res.data.forEach(trans => {
+                this.grandTotal += Number(trans.transtotal);
+                trans.transtotal = this.commaSeparate(parseFloat(trans.transtotal).toFixed(2));
+                trans.transdate = moment(trans.transdate).format('MM/DD/YYYY');
+              });
+              //add the total to the last row
+              this.tableData.push({transtotal: this.currencyformat(this.grandTotal) });
+            }
+            else
+            {
+              console.log("There are no transactions.");
+            }
+          }
+          if(this.selectedReportType == 3){
+            //Total Item Sales
+            let res = await this.callApi("POST", "/itemselltrans/reporttransreceived", {filters: this.filters});
+            if (res.data) {
+              //format the headers
+              this.headers = [
+                { text: 'Client', value: 'client.accountname',},
+                { text: 'Price Code', value: 'pricecode' },
+                { text: 'Status', value: 'transstatus' },
+                { text: 'Date', value: 'transdate' },
+                { text: 'Total', value: 'transtotal', align: "right", },
+              ],
+              //format the tableData
+              this.tableData = res.data;
+              //get the totals
+               this.grandTotal = 0;
               res.data.forEach(trans => {
                 this.grandTotal += Number(trans.transtotal);
                 trans.transtotal = this.commaSeparate(parseFloat(trans.transtotal).toFixed(2));
@@ -190,9 +222,6 @@
             }
           }
           else if(this.selectedReportType == 2){
-            //change the headers
-            //change the tabledata
-            //Total Item Sales
             let res = await this.callApi("POST", "/itemselltrans/salesperitem", {filters: this.filters});
             if (res.data) {
               console.log(res.data);
@@ -209,14 +238,15 @@
                 { text: 'Total', value: 'totalcost', align: "right", },
               ],
               //format the tableData
+              this.grandTotal = 0;
               this.tableData = [];
               res.data.forEach(trans => {
                 //get the all items in each trans
+
                 if(trans.transitems){
                   trans.transitems.forEach(item => {
                     //compute total
                     this.grandTotal += Number(item.totalcost);
-
                     item.transdate =  moment(trans.transdate).format('MM/DD/YYYY');
                     item.pricecode = trans.pricecode
                     item.priceeach = this.commaSeparate(parseFloat(item.priceeach).toFixed(2));
@@ -232,7 +262,48 @@
             else {
               console.log("There are no transactions.");
             }
+          }
+          else if(this.selectedReportType == 4){
+            let res = await this.callApi("POST", "/itemselltrans/receivedperitem", {filters: this.filters});
+            if (res.data) {
+              console.log(res.data);
+              //format the headers
+              this.headers = [
+                { text: 'Date', value: 'transdate' },
+                { text: 'Code', value: 'itemcode',},
+                { text: 'Item Description', value: 'itemdescrip',},
+                { text: 'Price Code', value: 'pricecode' },
+                { text: 'Pieces', value: 'totalpieces' },
+                { text: 'Size', value: 'size' },
+                { text: 'Quantity', value: 'quantity' },
+                { text: 'Price Each', value: 'priceeach' },
+                { text: 'Total', value: 'totalcost', align: "right", },
+              ],
+              //format the tableData
+              this.grandTotal = 0;
+              this.tableData = [];
+              res.data.forEach(trans => {
+                //get the all items in each trans
 
+                if(trans.transitems){
+                  trans.transitems.forEach(item => {
+                    //compute total
+                    this.grandTotal += Number(item.totalcost);
+                    item.transdate =  moment(trans.transdate).format('MM/DD/YYYY');
+                    item.pricecode = trans.pricecode
+                    item.priceeach = this.commaSeparate(parseFloat(item.priceeach).toFixed(2));
+                    item.totalcost = this.commaSeparate(parseFloat(item.totalcost).toFixed(2));
+                    this.tableData.push(item);
+
+                  })
+                }
+              });
+              //add the total to the last row
+              this.tableData.push({totalcost: this.currencyformat(this.grandTotal) });
+            }
+            else {
+              console.log("There are no transactions.");
+            }
           }
         }
       },

@@ -109,3 +109,15 @@ input::placeholder {
   padding-bottom: 5px;
   background-color: rgb(31, 128, 119);
 }
+#draggable-container-ItemTransfer {
+  position: absolute;
+  z-index: 9;
+  width: 600px;
+}
+#draggable-header-ItemTransfer {
+  z-index: 10;
+  padding-left: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background-color: rgb(154, 32, 170);
+}

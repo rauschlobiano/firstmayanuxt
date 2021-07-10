@@ -61,7 +61,7 @@
 
       <v-dialog v-model="showdialog" max-width="400">
         <v-card>
-          <v-card-title class="headline"> Item Transactions History </v-card-title>
+          <v-card-title class="headline"> Item Transactions History</v-card-title>
           <v-card-text>
             <strong> Item:  {{ selectedItem.itemdescrip}} </strong>
           <v-row>

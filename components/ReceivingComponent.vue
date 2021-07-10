@@ -452,7 +452,6 @@ export default {
 
     async getalltransactions() {
       let res = await this.callApi("GET", "/itemselltrans/receivinglist");
-      console.log(res.data);
       if (res.data) {
         this.updateItemReceiveTrans(res.data);
       } else {
@@ -556,6 +555,7 @@ export default {
         //add new row to transaction items
         this.transinfo.transitems.push({
           _id: this.selecteditem._id,
+          item_id: this.selecteditem._id,
           itemcounter: this.itemcounter,
           itemcode: this.selecteditem.itemcode,
           itemdescrip: this.selecteditem.itemdescrip,

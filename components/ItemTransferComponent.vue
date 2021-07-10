@@ -1,16 +1,12 @@
 <template>
   <v-app>
-    <div
-      ref="draggableContainerSellItem"
-      id="draggable-container-sellitem"
-      class="pa-0"
-      @click="incrementZindex"
-    >
-      <v-card elevation="2" :min-width="1000" v-if="showflag">
-        <div id="draggable-header-sellitem" @mousedown="dragMouseDown">
+    <div  ref="draggableContainerItemTransfer" id="draggable-container-ItemTransfer"
+      class="pa-0"  @click="incrementZindex">
+      <v-card elevation="2" :min-width="1100" v-if="showflag">
+        <div id="draggable-header-ItemTransfer" @mousedown="dragMouseDown">
           <v-row>
             <v-col cols="2">
-              <span style="color: white; font-size: 12px"> Sell Items </span>
+              <span style="color: white; font-size: 12px"> Item Transfer </span>
             </v-col>
             <v-spacer> </v-spacer>
             <v-col cols="1" class="text-right">
@@ -23,12 +19,12 @@
         </div>
         <div class="ma-2">
           <v-row>
-            <v-col cols="3">
+            <v-col cols="2">
               <v-text-field dense v-model="search"  append-icon="mdi-magnify"  label="Search"
                 single-line hide-details>
               </v-text-field>
 
-              <v-data-table height="500px" :headers="headers" :items="this.$store.state.itemselltrans"
+              <v-data-table height="500px" :headers="headers" :items="this.$store.state.itemreceivetrans"
                 item-key="_id"  no-data-text="No Data" :hide-default-footer="true"
                 class="elevation-1 my-0" :search="search"  disable-pagination>
                 <template v-slot:body="{ items }">
@@ -37,193 +33,101 @@
                       :class="{
                         selectedRow: item._id == selectedtrans._id,
                       }">
-                      <!-- <td>{{ String(item.transno).padStart(6, "0") }}</td> -->
-                      <!-- <td>
-                        {{ String(item._id).substring(item._id.length - 6) }}
-                      </td> -->
                       <td>{{ item.client.accountname }}</td>
                     </tr>
                   </tbody>
                 </template>
               </v-data-table>
-
             </v-col>
 
-            <v-col cols="9">
+            <v-col cols="10">
+               <v-row>
+                  <v-col>
+                    <div class="text-right">
+                      <v-btn class="mr-1" small  outlined color="primary"
+                        @click="createnew" v-if="!creating" depressed
+                        ><v-icon>mdi-plus</v-icon> Create
+                      </v-btn>
+                    </div>
+                  </v-col>
+              </v-row>
               <v-row>
-                <v-col cols="7">
-                  <v-row class="mt-4">
-                    <!-- CLIENT -->
-                    <v-col cols="8">
-                      <v-autocomplete dense flat light v-model="profselect" v-if="creating"
-                        :loading="profloading" :items="profitems"  :search-input.sync="profsearch"
-                        cache-items class="caption" hide-no-data  hide-details
-                        label="Client/Customer"  @change="autocompleteselectprofile"
-                      >
-                      </v-autocomplete>
-                      <v-text-field v-model="selectedtrans.clientname" dense label="Client/Customer" readonly v-if="!creating">
-                      </v-text-field>
-                    </v-col>
-                    <!-- PRICE CODE -->
-                    <v-col cols="4">
-                      <v-select v-model="pricecode" dense :rules="inputRules" class="caption" v-if="creating"
-                        :items="this.$store.state.pricecodes" label="Price Code"
-                        item-text="pricecodedescrip"  item-value="pricecodedescrip"  @change="pricecodechanged"
+                <v-col cols="5">
+                  <v-row dense>
+                    <!-- SOURCE -->
+                    <v-col cols="12">
+                      <v-select v-model="itemSourceLocation" dense :rules="inputRules" :items="this.$store.state.itemlocations"
+                        label="Source Location"  item-text="location" class="centered-input caption"
+                        item-value="location" @change="selectSourceLocation"
                       >
                       </v-select>
-
-                      <v-text-field v-model="selectedtrans.pricecode" dense label="Price Code" readonly v-if="!creating">
-                      </v-text-field>
                     </v-col>
                   </v-row>
 
-                  <v-row dense >
-                    <v-col>
-                      <v-card v-if="creating">
-                        <v-container>
-                          <v-form v-model="validsale" ref="saleform"
-                            lazy-validation >
-                            <v-row class="mt-2">
-                              <!-- ITEM DESCRIPTION -->
-                              <v-col cols="8">
-                                <v-autocomplete light v-model="itemselect" :loading="itemloading"
-                                  :items="itemitems" :search-input.sync="itemsearch" cache-items
-                                  class="caption pa-0 ma-0" hide-no-data hide-details label="Item Description"
-                                  :rules="inputRules"  @change="autocompleteselectitem">
-                                </v-autocomplete>
-                              </v-col>
-                              <!-- ITEM SIZE -->
-                              <v-spacer></v-spacer>
-                              <v-col cols="3" class="py-0 my-0">
-                                <v-select v-model="itemsize" dense :rules="inputRules" :items="localitemsizes"
-                                  label="Size"  item-text="itemsize" class="centered-input caption"
-                                  item-value="itemsize" @change="selectsize"
-                                >
-                                </v-select>
-                              </v-col>
-                            </v-row>
-                            <v-row dense>
-                              <!-- QUANTITY -->
-                              <v-col cols="3" class="py-0 my-0">
-                                <v-text-field v-model="quantity" label="Quantity"
-                                  class="centered-input caption" :rules="inputRules">
-                                </v-text-field>
-                              </v-col>
-                              <!-- PRICE EACH -->
-                              <v-col cols="3" class="py-0 my-0">
-                                <v-text-field class="right-input caption" readonly v-model="priceeachdisplay"
-                                  label="Price Each" :rules="inputRules">
-                                </v-text-field>
-                              </v-col>
-                              <!-- TOTAL COST -->
-                              <v-col cols="3" class="py-0 my-0">
-                                <v-text-field class="right-input caption"
-                                  readonly v-model="totalcostdisplay" label="Price Total"
-                                  :rules="inputRules"
-                                >
-                                </v-text-field>
-                              </v-col>
-                              <v-spacer></v-spacer>
-                              <!-- ADD BUTTON -->
-                              <v-col cols="3" class="text-right pb-0 mr-0">
-                                <v-btn dark  small color="success"
-                                  text @click="addtobasket">
-                                  <v-icon>mdi-arrow-down</v-icon> Add
-                                </v-btn>
-                              </v-col>
-                            </v-row>
-                          </v-form>
-                        </v-container>
-                      </v-card>
-                    </v-col>
-                  </v-row>
+                    <v-row dense>
+                      <v-col cols="12">
+                        <v-text-field dense v-model="searchSourceItem"  append-icon="mdi-magnify"  label="Search" single-line hide-details>
+                        </v-text-field>
+                        <div class="caption font-weight-bold">SOURCE ITEMS</div>
+                        <v-data-table
+                          height="377px" :headers="sourceitemsheader"  :items="sourceItems" item-key="itemcounter" no-data-text="No Items"
+                          :hide-default-footer="true" class="elevation-1 my-0" :search="searchSourceItem" >
+                          <template v-slot:body="{ items }">
+                            <tbody>
+                              <tr v-for="item in items" :key="item._id" @click="selectSourceItem(item)" @dblclick="selectSourceItemDialog(item)"
+                                :class="{
+                                  selectedRow: item._id == selectedSourceItem._id,
+                                }">
+                                 <td>{{item.itemcode}}</td>
+                                <td>{{item.itemdescrip}}</td>
+                                <td>{{item.totalpieces}}</td>
+                              </tr>
+                            </tbody>
+                          </template>
+                        </v-data-table>
+                      </v-col>
+                    </v-row>
+
                 </v-col>
 
-                <v-col cols="5">
-                  <v-row>
-                    <v-col>
-                      <div class="text-right mb-3">
-                        <v-btn class="mr-1" small  outlined color="primary"
-                          @click="createnew" v-if="!creating" depressed
-                          ><v-icon>mdi-plus</v-icon> Create
-                        </v-btn>
-                      </div>
+                <v-col cols="7">
+
+                   <v-row dense>
+                    <!-- DESTINATION -->
+                    <v-col cols="12">
+                      <v-select v-model="itemDestinationLocation" dense :rules="inputRules" :items="this.$store.state.itemlocations"
+                        label="Destination Location"  item-text="location" class="centered-input caption"
+                        item-value="location" @change="selectDestinationLocation"
+                      >
+                      </v-select>
                     </v-col>
-                  </v-row>
-                  <v-row>
-                    <v-col>
-                      <v-simple-table>
-                        <template v-slot:default>
-                          <tbody class="text-right">
-                            <tr v-if="!creating">
-                              <td>Trans # :</td>
-                              <td class="font-weight-bold">
-                                {{ String(selectedtrans._id).substring(selectedtrans._id.length - 6) }}
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>Date :</td>
-                              <td class="font-weight-bold">
-                                <span v-if="!creating">{{ transinfo.transdate }}</span>
-                                <span v-if="creating">
-                                  <v-text-field class="right-input caption" v-model="transinfo.transdate"
-                                    label="" :rules="dateRules" @change="transdateChanged">
-                                  </v-text-field>
-                                </span>
-                              </td>
-                            </tr>
-                            <tr v-if="!creating">
-                              <td>Status :</td>
-                              <td class="font-weight-bold">
-                                {{ transinfo.status }}
-                              </td>
-                            </tr>
-                            <tr style="height: 35px; background-color: honeydew" class="mt-2">
-                              <td>Total :</td>
-                              <td  class="font-weight-bold" style="font-size: 20px; color: darkgreen">
-                                {{ grandtotaldisplay }}
-                              </td>
-                            </tr>
-                            <!-- <tr>
-                              <td>Tendered :</td>
-                              <td>0</td>
-                            </tr>
-                            <tr>
-                              <td>Change :</td>
-                              <td>0</td>
-                            </tr> -->
-                          </tbody>
-                        </template>
-                      </v-simple-table>
-                    </v-col>
-                  </v-row>
+                    </v-row>
+                    <v-row >
+                        <v-col cols="12">
+                          <div class="caption font-weight-bold">ITEMS TO BE TRANSFERRED</div>
+                          <v-data-table
+                            height="390px" :headers="transitemsheader"  :items="transinfo.transitems" item-key="itemcounter" no-data-text="No Items"
+                            :hide-default-footer="true" class="elevation-1 my-0">
+                            <template v-slot:item="row">
+                                <tr>
+                                  <td>
+                                      <v-btn class="caption" text light x-small v-if="creating"
+                                        @click="removeItem(row.item)">
+                                        <v-icon color="green">mdi-delete-outline</v-icon>
+                                      </v-btn>
+                                  </td>
+                                  <td>{{row.item.itemcode}}</td>
+                                  <td>{{row.item.itemdescrip}}</td>
+                                  <td>{{row.item.quantity}}</td>
+                                  <td>{{row.item.size}}</td>
+                                </tr>
+                            </template>
+                          </v-data-table>
+                        </v-col>
+                      </v-row>
                 </v-col>
               </v-row>
-              <v-row>
-                <v-col cols="12">
-                  <div class="caption font-weight-bold">Items to be sold:</div>
-                  <v-data-table
-                    height="200px" :headers="transitemsheader"  :items="transinfo.transitems" item-key="itemcounter" no-data-text="No Items"
-                    :hide-default-footer="true" class="elevation-1 my-0">
-                    <template v-slot:item="row">
-                        <tr>
-                          <td>
-                              <v-btn class="caption" text light x-small v-if="creating"
-                                @click="removeItem(row.item)">
-                                <v-icon color="green">mdi-delete-outline</v-icon>
-                              </v-btn>
-                          </td>
-                          <td>{{row.item.itemcode}}</td>
-                          <td>{{row.item.itemdescrip}}</td>
-                          <td>{{row.item.quantity}}</td>
-                          <td>{{row.item.size}}</td>
-                          <td>{{row.item.priceeachdisplay}}</td>
-                          <td>{{row.item.totalcostdisplay}}</td>
-                        </tr>
-                    </template>
-                  </v-data-table>
-                </v-col>
-              </v-row>
+
               <v-row>
                 <v-col cols="9">
                   <v-text-field class="button" v-model="transinfo.notes"
@@ -240,6 +144,7 @@
             </v-col>
           </v-row>
         </div>
+
       </v-card>
       <v-snackbar v-model="snackbar">
         {{ snackbartext }}
@@ -249,6 +154,58 @@
           </v-btn>
         </template>
       </v-snackbar>
+
+
+          <v-dialog v-model="itemdialog" height="500" width="450">
+            <v-card>
+              <v-container>
+                  <v-row>
+                    <v-col>
+
+                          <v-form v-model="validsale" ref="transferform"
+                            lazy-validation >
+                            <v-row>
+                              <v-col class="text-center">
+                                <h4 class="ml-2">Transfer Item</h4>
+                                <h4>{{selectedSourceItem.itemdescrip}}</h4>
+                              </v-col>
+                            </v-row>
+                            <v-row class="mt-2">
+
+                              <!-- QUANTITY -->
+                              <v-col cols="6">
+                                <v-text-field dense v-model="quantity" label="Quantity"
+                                  class="centered-input caption" :rules="inputRules">
+                                </v-text-field>
+                              </v-col>
+
+                              <!-- ITEM SIZE -->
+                              <v-col cols="6">
+                                <v-select v-model="itemsize" dense :rules="inputRules" :items="localitemsizes"
+                                  label="Size"  item-text="itemsize" class="centered-input caption"
+                                  item-value="itemsize" @change="selectsize"
+                                >
+                                </v-select>
+                              </v-col>
+                            </v-row>
+
+                            <v-row>
+                              <v-spacer></v-spacer>
+                              <!-- ADD BUTTON -->
+                              <v-col class="text-right">
+                                <v-btn dark  small color="success"
+                                  text @click="addtobasket">
+                                  <v-icon>mdi-arrow-right</v-icon> Add
+                                </v-btn>
+                              </v-col>
+                            </v-row>
+                          </v-form>
+                    </v-col>
+                  </v-row>
+                </v-container>
+            </v-card>
+          </v-dialog>
+
     </div>
   </v-app>
 </template>
@@ -258,14 +215,14 @@ import { mapState, mapMutations } from "vuex";
 import moment from "moment";
 
 export default {
-  name: "SellItemComponent",
+  name: "ItemTransferComponent",
   props: ["showflag"],
 
   data: function () {
     return {
       ...mapState([
         "lastzindex",
-        "sellitemssumdata",
+        "ItemTransferssumdata",
         "vendorslistdata",
         "profileslistdata",
         "profilesarray",
@@ -273,6 +230,11 @@ export default {
       showdialog: false,
       snackbar: false,
       snackbartext: "",
+      itemdialog: false,
+      searchSourceItem: "",
+      searchDestinationItem: "",
+
+      sourceItems: [],
 
       //autocomplete profile
       profsearch: null,
@@ -284,6 +246,9 @@ export default {
       itemselect: null,
       itemloading: false,
       itemitems: [],
+      supplieritems: [],
+      itemSourceLocation: '',
+      itemDestinationLocation: '',
 
       //item template
       quantity: 1,
@@ -294,9 +259,6 @@ export default {
       totalcostdisplay: "0",
       selecteditem: {},
       totalpieces: 1,
-      pricecode: 1,
-
-      //transaction
 
       itemcounter: 0,
 
@@ -304,15 +266,15 @@ export default {
       selectedtrans: {
         _id: '',
         clientname: '',
-        pricecode: '',
-        status: '',
+		    status: '',
+      },
+      selectedSourceItem: {
+        _id: '',
       },
       transinfo: {
         transdate: '',
         transstatus: "Posted",
         client: "",
-        totalpieces: 1,
-        totalinventory: 1,
         clientname: "",
         pricecode: "",
 		    status: "Posted",
@@ -338,77 +300,17 @@ export default {
         { text: "Transactions", align: "start", value: "client.accountname" },
       ],
       transitemsheader: [
-        {
-          text: "",
-          value: "x",
-          sortable: false,
-          width: "5%",
-          fixed: true,
-          class: 'dtheaderbg',
-          align: 'center'},
-        // {
-        //   text: "Count",
-        //   align: "",
-        //   value: "itemcounter",
-        //   class: "dtheaderbg",
-        //   sortable: false,
-        //   width: "20px",
-        //   fixed: true,
-        // },
-        {
-          text: "Code",
-          align: "center",
-          value: "itemcode",
-          class: "dtheaderbg",
-          sortable: false,
-          width: "8%",
-          fixed: true,
-        },
-        {
-          text: "Description",
-          align: "center",
-          value: "itemdescrip",
-          class: "dtheaderbg",
-          sortable: false,
-          width: "20%",
-          fixed: true,
-        },
-        {
-          text: "Quantity",
-          align: "center",
-          value: "quantity",
-          class: "dtheaderbg",
-          sortable: false,
-          width: "7%",
-          fixed: true,
-        },
-        {
-          text: "Size",
-          align: "center",
-          value: "size",
-          class: "dtheaderbg",
-          sortable: false,
-          width: "10%",
-          fixed: true,
-        },
-        {
-          text: "Cost",
-          align: "right",
-          value: "priceeachdisplay",
-          class: "dtheaderbg",
-          sortable: false,
-          width: "12%",
-          fixed: true,
-        },
-        {
-          text: "Total",
-          align: "right",
-          value: "totalcostdisplay",
-          class: "dtheaderbg",
-          sortable: false,
-          width: "15%",
-          fixed: true,
-        },
+        {  text: "", value: "x",  sortable: false, width: "5%",  fixed: true, class: 'dtheaderbg', align: 'center'},
+        { text: "Code",  align: "center", value: "itemcode", class: "dtheaderbg", sortable: false, width: "8%", fixed: true,},
+        { text: "Description", align: "center", value: "itemdescrip", class: "dtheaderbg", sortable: false, width: "20%", fixed: true,},
+        { text: "Quantity", align: "center", value: "quantity", class: "dtheaderbg", sortable: false, width: "7%", fixed: true,},
+        { text: "Size", align: "center", value: "size", class: "dtheaderbg", sortable: false, width: "10%", fixed: true,},
+      ],
+      sourceitemsheader: [
+        { text: "Code",  align: "center", value: "_id", class: "dtheaderbg", sortable: false, width: "8%", fixed: true,},
+        { text: "Description", align: "center", value: "itemdescrip", class: "dtheaderbg", sortable: false, width: "20%", fixed: true,},
+        { text: "Pieces", align: "center", value: "totalpieces", class: "dtheaderbg", sortable: false, width: "20%", fixed: true,},
+
       ],
       creating: false,
       positions: {
@@ -421,7 +323,7 @@ export default {
   }, //end of data
 
   methods: {
-    ...mapMutations(["mutateZindex", "updateItemSellTrans"]),
+    ...mapMutations(["mutateZindex", "updateItemReceiveTrans"]),
     tellParentToUpdate() {
       this.$emit("reupdateitemselllist");
     },
@@ -452,18 +354,17 @@ export default {
 		}
 	  else {
         this.snackbar = false;
-        this.transinfo.pricecode = this.pricecode;
-        this.transinfo.transtype = "Selling";
-        // let newtransdate = new Date(this.transinfo.transdate);
-        // this.transinfo.transdate = newtransdate;
+        this.transinfo.pricecode = "Supplier Price";
+        this.transinfo.transtype = "ItemTransfer";
+
         let res = await this.callApi("POST", "/itemselltrans", this.transinfo);
         console.log(res);
         if (res.data.created) {
           this.snackbar = true;
           this.snackbartext = "Transaction Saved!";
           //clear
-          this.$refs.saleform.reset();
-          this.$refs.saleform.resetValidation();
+          this.$refs.receiveform.reset();
+          this.$refs.receiveform.resetValidation();
           this.clearAll();
           //update list
           //this.tellParentToUpdate();
@@ -475,10 +376,37 @@ export default {
       }
     },
 
-    async getalltransactions() {
-      let res = await this.callApi("GET", "/itemselltrans/translist");
+    async selectSourceLocation(val){
+      console.log('selecting source location: '+ val);
+      //query all items in the select source location
+      let res = await this.callApi("GET", "/itemselltrans/itemsbylocation/"+val);
+      console.log(res.data);
       if (res.data) {
-        this.updateItemSellTrans(res.data);
+        this.sourceItems = res.data;
+      } else {
+        console.log("There are no transaction data.");
+      }
+    },
+
+    selectDestinationLocation(selected){
+      //must not be the same as Source
+      if(this.itemSourceLocation == selected)
+      {
+        this.snackbar = true;
+        this.snackbartext = "Destination Location must not be the same as Source Location";
+        this.itemDestinationLocation = '';
+      }
+      else{
+        console.log('selecting destination location');
+
+      }
+    },
+
+    async getalltransactions() {
+      let res = await this.callApi("GET", "/itemselltrans/ItemTransferlist");
+      console.log(res.data);
+      if (res.data) {
+        this.updateItemReceiveTrans(res.data);
       } else {
         console.log("There are no transaction data.");
       }
@@ -520,7 +448,7 @@ export default {
       this.totalcostdisplay = "0";
       this.selecteditem = {};
       this.totalpieces = 1;
-      this.pricecode = 1;
+      this.pricecode = "Supplier Price";
 
       //transaction
       this.itemcounter = 0;
@@ -574,18 +502,17 @@ export default {
 
     addtobasket() {
       //validation first
-      this.validsale = this.$refs.saleform.validate();
+      this.validsale = this.$refs.receiveform.validate();
       if (this.validsale) {
         this.itemcounter++;
         //add new row to transaction items
         this.transinfo.transitems.push({
           _id: this.selecteditem._id,
-          item_id: this.selecteditem._id,
           itemcounter: this.itemcounter,
           itemcode: this.selecteditem.itemcode,
           itemdescrip: this.selecteditem.itemdescrip,
           totalpieces: this.totalpieces,
-          totalinventory: this.totalpieces * -1,
+          totalinventory: this.totalpieces,
           quantity: this.quantity,
           itemsize: this.itemsize,
           size: this.itemsize,
@@ -600,15 +527,27 @@ export default {
 
     autocompleteselectprofile(selected) {
       console.log(selected);
-      let found = this.$store.state.profileslistdata.find(function (item,index) {
-        if (item.accountname == selected) return item;
+      let found = this.$store.state.vendorslistdata.find(function (item,index) {
+        if (item.accountname == selected)
+        return item;
       });
 
       if (found) {
         this.transinfo.client = found._id;
-        this.transinfo.pricecode = found.pricecode;
-        this.pricecode = found.pricecode;
+        this.getSupplierItems(found._id);
       }
+    },
+
+    getSupplierItems(supplier_id){
+      console.log('finding items');
+      let newitemsarray = [];
+      this.$store.state.itemslistdata.map(function (item,index) {
+        if (item.supplierprofid == supplier_id){
+          newitemsarray.push(item.itemdescrip);
+        }
+      });
+      this.supplieritems = newitemsarray;
+      console.log(newitemsarray);
     },
 
     autocompleteselectitem(selected) {
@@ -640,28 +579,17 @@ export default {
         this.itemsize = "Piece";
         this.totalpieces = 1;
         //get price
-        this.getpriceeach(founditem._id, this.pricecode);
+        this.getpriceeach(founditem._id);
       }
     },
 
-    // getsizedescription(sizeid){
-    //    let foundsize = this.localitemsizes.find(function(item, index) {
-    //       if(item.itemsizeid == sizeid)
-    //         return item;
-    //   });
-    //   return foundsize.itemsizedescrip
-    // },
-
-    getpriceeach(_id, pricecodeid) {
-      //affected by the client/customer that refers to the Price Code
-      let foundprice = this.$store.state.itemprices.find(function (
-        price,
-        index
-      ) {
-        if (price.item_id == _id && price.pricecode == pricecodeid)
+    getpriceeach(_id) {
+      let foundprice = this.$store.state.itemprices.find(function ( price,index) {
+        console.log(price);
+        if (price.item_id == _id && price.pricecode == "Supplier Price")
           return price;
       });
-
+      console.log(foundprice);
       if (foundprice) {
         this.priceeach = parseFloat(foundprice.price);
       } else {
@@ -704,27 +632,11 @@ export default {
       //re-compute
       this.computeeachcost();
     },
-    pricecodechanged(val) {
-      this.pricecode = val;
-      this.transinfo.pricecode = val;
-    },
 
-    increment() {
-      if (this.quantity < 999999) {
-        this.quantity++;
-      }
-    },
-    decrement() {
-      if (this.quantity > 1) {
-        this.quantity--;
-      } else {
-        this.quantity = 1;
-      }
-    },
     querySelectionsProf(v) {
       this.profloading = true;
       setTimeout(() => {
-        this.profitems = this.$store.state.profilesarray.filter((e) => {
+        this.profitems = this.$store.state.vendorsarray.filter((e) => {
           return (e || "").toLowerCase().indexOf((v || "").toLowerCase()) > -1;
         });
         this.profloading = false;
@@ -734,7 +646,7 @@ export default {
       this.itemloading = true;
       // Simulated ajax query
       setTimeout(() => {
-        this.itemitems = this.$store.state.itemsarray.filter((e) => {
+        this.itemitems = this.supplieritems.filter((e) => {
           return (e || "").toLowerCase().indexOf((v || "").toLowerCase()) > -1;
         });
         this.itemloading = false;
@@ -751,6 +663,32 @@ export default {
       //fetch the details
       this.getspecifictrans(item._id);
     },
+    selectSourceItem(item) {
+      this.selectedSourceItem._id = item._id;
+      this.selectedSourceItem.itemdescrip = item.itemdescrip;
+
+    },
+    selectSourceItemDialog(item) {
+      this.itemdialog = true;
+      console.log(item);
+
+      //also, get the item sizes based on the selected item
+        //from itemsizepiece
+        this.itemsizepieces.forEach((element) => {
+
+          if (element.item_id == this.selectedSourceItem._id) {
+            this.localitemsizes.push({
+              itemsizeid: element.itemsizeid,
+              itemsize: element.itemsize,
+              pieces: element.pieces,
+            });
+          }
+        });
+
+        //set the default selected to pieces
+        this.itemsize = "Piece";
+        this.totalpieces = 1;
+    },
 
     async getspecifictrans(id) {
 		this.clearAll();
@@ -760,14 +698,12 @@ export default {
         console.log(res.data);
         let info = res.data;
         this.selectedtrans.clientname = info.client.accountname;
-        this.selectedtrans.pricecode = info.pricecode;
 
         this.transinfo._id = info._id;
         this.transinfo.transdate = moment(info.transdate).format('MM/DD/YYYY');
         this.transinfo.transstatus = info.transstatus;
 
         this.transinfo.clientname = info.client.accountname;
-        this.transinfo.pricecode = info.pricecode;
         this.transinfo.transtotal = info.transtotal;
         this.grandtotaldisplay = this.currencyformat(info.transtotal);
         this.transinfo.transitems = info.transitems;
@@ -782,9 +718,9 @@ export default {
     incrementZindex() {
       //if form is still shown
       if (this.showflag) {
-        document.getElementById("draggable-container-sellitem").style.zIndex =
+        document.getElementById("draggable-container-ItemTransfer").style.zIndex =
           this.$store.state.lastzindex + 1;
-        document.getElementById("draggable-header-sellitem").style.zIndex =
+        document.getElementById("draggable-header-ItemTransfer").style.zIndex =
           this.$store.state.lastzindex + 2;
         this.mutateZindex();
       }
@@ -798,6 +734,7 @@ export default {
       document.onmousemove = this.elementDrag;
       document.onmouseup = this.closeDragElement;
     },
+
     elementDrag: function (event) {
       event.preventDefault();
       this.positions.movementX = this.positions.clientX - event.clientX;
@@ -805,15 +742,16 @@ export default {
       this.positions.clientX = event.clientX;
       this.positions.clientY = event.clientY;
       // set the element's new position:
-      this.$refs.draggableContainerSellItem.style.top =
-        this.$refs.draggableContainerSellItem.offsetTop -
+      this.$refs.draggableContainerItemTransfer.style.top =
+        this.$refs.draggableContainerItemTransfer.offsetTop -
         this.positions.movementY +
         "px";
-      this.$refs.draggableContainerSellItem.style.left =
-        this.$refs.draggableContainerSellItem.offsetLeft -
+      this.$refs.draggableContainerItemTransfer.style.left =
+        this.$refs.draggableContainerItemTransfer.offsetLeft -
         this.positions.movementX +
         "px";
     },
+
     closeDragElement() {
       document.onmouseup = null;
       document.onmousemove = null;
@@ -821,7 +759,7 @@ export default {
   }, //end of methods
 
   async created() {
-    this.getalltransactions();
+
   },
   computed: {
     itemsizepieces(val) {
@@ -874,9 +812,7 @@ export default {
       if (parseFloat(this.totalcost) > 0)
         this.totalcostdisplay = this.currencyformat(this.totalcost);
     },
-    pricecode: function () {
-      this.getpriceeach(this.selecteditem._id, this.pricecode);
-    },
+
   },
 }; //end of export default
 </script>

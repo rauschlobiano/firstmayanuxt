@@ -6,6 +6,7 @@ export const state = () => ({
   profilesarray: [],
   vendorslistdata: [],
   vendorsarray: [],
+  itemlocations: [],
 
   genders: [],
   civilstats: [],
@@ -100,6 +101,9 @@ export const mutations = {
   },
   updateItemReceiveTrans(state, newlist){
     state.itemreceivetrans = newlist
+  },
+  updateItemLocations(state, newlist){
+    state.itemlocations = newlist
   },
 
 
