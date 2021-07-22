@@ -50,9 +50,19 @@
             </v-col>
 
             <v-col cols="9">
-              <v-row>
+              <v-row dense>
+				<v-col>
+					<div class="text-right mb-3">
+					<v-btn class="mr-1" small  outlined color="primary"
+						@click="createnew" v-if="!creating" depressed
+						><v-icon>mdi-plus</v-icon> Create
+					</v-btn>
+					</div>
+				</v-col>
+			</v-row>
+              <v-row dense>
                 <v-col cols="7">
-                  <v-row class="mt-4">
+                  <v-row>
                     <!-- CLIENT -->
                     <v-col cols="8">
                       <v-autocomplete dense flat light v-model="profselect" v-if="creating"
@@ -83,7 +93,7 @@
                         <v-container>
                           <v-form v-model="validsale" ref="saleform"
                             lazy-validation >
-                            <v-row class="mt-2">
+                            <v-row>
                               <!-- ITEM DESCRIPTION -->
                               <v-col cols="8">
                                 <v-autocomplete light v-model="itemselect" :loading="itemloading"
@@ -140,17 +150,22 @@
                 </v-col>
 
                 <v-col cols="5">
-                  <v-row>
+                  <v-row dense>
                     <v-col>
-                      <div class="text-right mb-3">
-                        <v-btn class="mr-1" small  outlined color="primary"
-                          @click="createnew" v-if="!creating" depressed
-                          ><v-icon>mdi-plus</v-icon> Create
-                        </v-btn>
-                      </div>
+                      <!-- ITEM LOCATION -->
+                      <v-col cols="12">
+                        <v-select v-model="transinfo.itemlocation" dense :items="this.$store.state.itemlocations" v-if="creating"
+                          label="Item Location"  item-text="location" class="centered-input caption"
+                          item-value="location" @change="selectItemLocation">
+                        </v-select>
+
+                        <v-text-field v-model="transinfo.itemlocation" dense label="Item Location" readonly v-if="!creating">
+                        </v-text-field>
+                      </v-col>
                     </v-col>
                   </v-row>
-                  <v-row>
+
+                  <v-row dense>
                     <v-col>
                       <v-simple-table>
                         <template v-slot:default>
@@ -199,7 +214,7 @@
                   </v-row>
                 </v-col>
               </v-row>
-              <v-row>
+              <v-row dense>
                 <v-col cols="12">
                   <div class="caption font-weight-bold">Items to be sold:</div>
                   <v-data-table
@@ -231,7 +246,7 @@
                   </v-text-field>
                 </v-col>
                 <v-col cols="2">
-                  <v-btn dark small  color="success"  @click="savetransaction"
+                  <v-btn dark small  color="success"  @click="savetransaction" :disabled="!creating"
                     v-if="creating"  bottom  right absolute>
                     <v-icon small>mdi-content-save</v-icon> Save
                   </v-btn>
@@ -310,6 +325,7 @@ export default {
       transinfo: {
         transdate: '',
         transstatus: "Posted",
+        itemlocation: '',
         client: "",
         totalpieces: 1,
         totalinventory: 1,
@@ -328,10 +344,10 @@ export default {
         (v) => !!v || "Required",
         //v => (v && v.length <= 6) || 'Address ID must be 6 characters',
       ],
-	  dateRules: [
-		(v) => !!v || "Required",
-		v => (v && this.validateDate(v)) || 'Invalid Date',
-	  ],
+      dateRules: [
+        (v) => !!v || "Required",
+        v => (v && this.validateDate(v)) || 'Invalid Date',
+        ],
 
       headers: [
         // { text: "TransID", align: "center", value: "_id" },
@@ -345,16 +361,8 @@ export default {
           width: "5%",
           fixed: true,
           class: 'dtheaderbg',
-          align: 'center'},
-        // {
-        //   text: "Count",
-        //   align: "",
-        //   value: "itemcounter",
-        //   class: "dtheaderbg",
-        //   sortable: false,
-        //   width: "20px",
-        //   fixed: true,
-        // },
+          align: 'center'
+        },
         {
           text: "Code",
           align: "center",
@@ -425,6 +433,9 @@ export default {
     tellParentToUpdate() {
       this.$emit("reupdateitemselllist");
     },
+    selectItemLocation(val){
+      console.log(val);
+    },
     removeItem(item){
       console.log(item);
       this.transinfo.transitems = this.transinfo.transitems.filter(function(i) {
@@ -445,34 +456,36 @@ export default {
         this.snackbartext =
           "There is no transaction to save based on the Totals";
       }
-		else if(!this.validateDate(this.transinfo.transdate)){
-			this.snackbar = true;
-        this.snackbartext =
-          "Date is not valid.";
-		}
-	  else {
-        this.snackbar = false;
-        this.transinfo.pricecode = this.pricecode;
-        this.transinfo.transtype = "Selling";
-        // let newtransdate = new Date(this.transinfo.transdate);
-        // this.transinfo.transdate = newtransdate;
-        let res = await this.callApi("POST", "/itemselltrans", this.transinfo);
-        console.log(res);
-        if (res.data.created) {
-          this.snackbar = true;
-          this.snackbartext = "Transaction Saved!";
-          //clear
-          this.$refs.saleform.reset();
-          this.$refs.saleform.resetValidation();
-          this.clearAll();
-          //update list
-          //this.tellParentToUpdate();
-          this.getalltransactions();
-        } else {
-          this.snackbar = true;
-          this.snackbartext = "Transaction Failed....";
-        }
+      else if(!this.validateDate(this.transinfo.transdate)){
+        this.snackbar = true;
+          this.snackbartext =
+            "Date is not valid.";
       }
+      else {
+        this.creating = false;
+          this.snackbar = false;
+          this.transinfo.pricecode = this.pricecode;
+          this.transinfo.transtype = "Selling";
+          // let newtransdate = new Date(this.transinfo.transdate);
+          // this.transinfo.transdate = newtransdate;
+          let res = await this.callApi("POST", "/itemselltrans", this.transinfo);
+          console.log(res);
+          if (res.data.created) {
+            this.snackbar = true;
+            this.snackbartext = "Transaction Saved!";
+            //clear
+            // this.$refs.saleform.reset();
+            // this.$refs.saleform.resetValidation();
+            this.clearAll();
+            //update list
+            //this.tellParentToUpdate();
+            this.getalltransactions();
+          } else {
+            creating = true;
+            this.snackbar = true;
+            this.snackbartext = "Transaction Failed....";
+          }
+        }
     },
 
     async getalltransactions() {
@@ -528,13 +541,13 @@ export default {
       this.transinfo.transitems = [];
       this.grandtotaldisplay = "0.0";
 
-
       this.transinfo.client = "";
       this.transinfo.clientname = "";
 
       this.transinfo.transtotal = 0;
       this.transinfo.transitems = [];
       this.transinfo.notes = "";
+      this.transinfo.itemlocation = '';
 
       this.validsale = false;
       this.valid = false;
@@ -548,6 +561,7 @@ export default {
       this.creating = true;
       //set the date today automatically
       this.transinfo.transdate = moment().format('MM/DD/YYYY');
+      this.transinfo.itemlocation = 'Warehouse';
     },
     computetotal() {
       this.transinfo.transtotal = 0;
@@ -581,6 +595,7 @@ export default {
         this.transinfo.transitems.push({
           _id: this.selecteditem._id,
           item_id: this.selecteditem._id,
+          itemlocation: this.transinfo.itemlocation,
           itemcounter: this.itemcounter,
           itemcode: this.selecteditem.itemcode,
           itemdescrip: this.selecteditem.itemdescrip,
@@ -593,6 +608,7 @@ export default {
           priceeachdisplay: this.priceeachdisplay,
           totalcost: this.totalcost,
           totalcostdisplay: this.totalcostdisplay,
+          transtype: "Selling",
         });
         this.computetotal();
       }
@@ -765,6 +781,7 @@ export default {
         this.transinfo._id = info._id;
         this.transinfo.transdate = moment(info.transdate).format('MM/DD/YYYY');
         this.transinfo.transstatus = info.transstatus;
+        this.transinfo.itemlocation = info.itemlocation;
 
         this.transinfo.clientname = info.client.accountname;
         this.transinfo.pricecode = info.pricecode;

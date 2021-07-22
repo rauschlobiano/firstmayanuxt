@@ -2,6 +2,8 @@
 export const state = () => ({
   stateshowprofile: false,
   counter: 123,
+  userinfo: {},
+  legituser: false,
   profileslistdata: [],
   profilesarray: [],
   vendorslistdata: [],
@@ -23,6 +25,7 @@ export const state = () => ({
   itempricing: [],
   itemselltrans: [],
   itemreceivetrans: [],
+  itemtransfertrans: [],
 
   profiletypedata: [],
   sellitemssumdata: [],
@@ -37,6 +40,7 @@ export const mutations = {
   directmodify(state){
     state.stateshowprofile = !state.stateshowprofile
   },
+
   incrementCounter(state){
     state.counter++
   },
@@ -102,8 +106,17 @@ export const mutations = {
   updateItemReceiveTrans(state, newlist){
     state.itemreceivetrans = newlist
   },
+  updateItemTransferTrans(state, newlist){
+    state.itemtransfertrans = newlist
+  },
   updateItemLocations(state, newlist){
     state.itemlocations = newlist
+  },
+  updateUserInfo(state, newinfo){
+    state.userinfo = newinfo
+  },
+  updateLegitUser(state, newinfo){
+    state.legituser = newinfo
   },
 
 

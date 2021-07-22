@@ -568,6 +568,7 @@ export default {
           priceeachdisplay: this.priceeachdisplay,
           totalcost: this.totalcost,
           totalcostdisplay: this.totalcostdisplay,
+          transtype: "Receiving",
         });
         this.computetotal();
       }

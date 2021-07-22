@@ -165,6 +165,7 @@ import ReportViewerComponent from "~/components/ReportViewerComponent";
 import InventoryComponent from "~/components/InventoryComponent";
 import ReceivingComponent from "~/components/ReceivingComponent";
 import ItemTransferComponent from "~/components/ItemTransferComponent";
+import moment from "moment";
 
 export default {
   components: {
@@ -207,6 +208,7 @@ export default {
       "updateAccountStatsList",
       "updateProfGroupList",
       "updateItemLocations",
+      "updateItemTransferTrans",
     ]),
     clickProfile() {
       this.showhideprof = !this.showhideprof;
@@ -284,12 +286,16 @@ export default {
       let res = await this.callApi("get", "/itemlocations");
         console.log(res.data);
       this.updateItemLocations(res.data);
-
-      // let itemarray = [];
-      // res.data.forEach((element) => {
-      //   itemarray.push(element.itemdescrip);
-      // });
-      // this.updateItemArray(itemarray);
+    },
+    async getallitemtransfers(state) {
+      console.log("getting all items transfers");
+      let res = await this.callApi("GET", "/itemselltrans/itemtransferlist");
+        console.log(res.data);
+        //format the date
+        res.data.forEach(element => {
+          element.transdate = moment(element.transdate).format('MM/DD/YYYY');
+        });
+      this.updateItemTransferTrans(res.data);
     },
     async getallitemsizes(state) {
       console.log("getting all item sizes");
@@ -421,6 +427,7 @@ export default {
       this.getallitemsizepieces();
       this.getallitemprices();
       this.getallitemlocations();
+      this.getallitemtransfers();
     }
   },
 };

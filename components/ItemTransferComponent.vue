@@ -24,7 +24,7 @@
                 single-line hide-details>
               </v-text-field>
 
-              <v-data-table height="500px" :headers="headers" :items="this.$store.state.itemreceivetrans"
+              <v-data-table height="500px" :headers="headers" :items="this.$store.state.itemtransfertrans"
                 item-key="_id"  no-data-text="No Data" :hide-default-footer="true"
                 class="elevation-1 my-0" :search="search"  disable-pagination>
                 <template v-slot:body="{ items }">
@@ -33,7 +33,7 @@
                       :class="{
                         selectedRow: item._id == selectedtrans._id,
                       }">
-                      <td>{{ item.client.accountname }}</td>
+                      <td>{{ item.transdate }}</td>
                     </tr>
                   </tbody>
                 </template>
@@ -57,50 +57,71 @@
                     <!-- SOURCE -->
                     <v-col cols="12">
                       <v-select v-model="itemSourceLocation" dense :rules="inputRules" :items="this.$store.state.itemlocations"
-                        label="Source Location"  item-text="location" class="centered-input caption"
+                        label="Source Location"  item-text="location" class="centered-input caption" v-if="creating"
                         item-value="location" @change="selectSourceLocation"
                       >
                       </v-select>
+
+
+						            <v-text-field v-model="itemSourceLocation" dense label="Source Location" readonly v-if="!creating">
+                        </v-text-field>
+
                     </v-col>
                   </v-row>
 
-                    <v-row dense>
-                      <v-col cols="12">
-                        <v-text-field dense v-model="searchSourceItem"  append-icon="mdi-magnify"  label="Search" single-line hide-details>
-                        </v-text-field>
-                        <div class="caption font-weight-bold">SOURCE ITEMS</div>
-                        <v-data-table
-                          height="377px" :headers="sourceitemsheader"  :items="sourceItems" item-key="itemcounter" no-data-text="No Items"
-                          :hide-default-footer="true" class="elevation-1 my-0" :search="searchSourceItem" >
-                          <template v-slot:body="{ items }">
-                            <tbody>
-                              <tr v-for="item in items" :key="item._id" @click="selectSourceItem(item)" @dblclick="selectSourceItemDialog(item)"
-                                :class="{
-                                  selectedRow: item._id == selectedSourceItem._id,
-                                }">
-                                 <td>{{item.itemcode}}</td>
-                                <td>{{item.itemdescrip}}</td>
-                                <td>{{item.totalpieces}}</td>
-                              </tr>
-                            </tbody>
-                          </template>
-                        </v-data-table>
-                      </v-col>
-                    </v-row>
+                  <v-row dense>
+                    <v-col cols="12">
+                      <v-text-field dense v-model="searchSourceItem"  append-icon="mdi-magnify"  label="Search" single-line hide-details>
+                      </v-text-field>
+
+                      <div class="caption font-weight-bold">SOURCE ITEMS</div>
+
+                      <v-data-table
+                        height="377px" :headers="sourceitemsheader"  :items="sourceItems" item-key="itemcounter" no-data-text="No Items"
+                        :hide-default-footer="true" class="elevation-1 my-0" :search="searchSourceItem" v-if="creating">
+                        <template v-slot:body="{ items }">
+                          <tbody>
+                            <tr v-for="item in items" :key="item._id" @click="selectSourceItem(item)" @dblclick="selectSourceItemDialog(item)"
+                              :class="{
+                                selectedRow: item._id == selectedSourceItem._id,
+                              }">
+                                <td>{{item.itemcode}}</td>
+                              <td>{{item.itemdescrip}}</td>
+                              <td>{{item.totalpieces}}</td>
+                            </tr>
+                          </tbody>
+                        </template>
+                      </v-data-table>
+
+                    </v-col>
+                  </v-row>
 
                 </v-col>
 
                 <v-col cols="7">
-
                    <v-row dense>
                     <!-- DESTINATION -->
-                    <v-col cols="12">
+                    <v-col cols="8">
                       <v-select v-model="itemDestinationLocation" dense :rules="inputRules" :items="this.$store.state.itemlocations"
-                        label="Destination Location"  item-text="location" class="centered-input caption"
+                        label="Destination Location"  item-text="location" class="centered-input caption" v-if="creating"
                         item-value="location" @change="selectDestinationLocation"
                       >
                       </v-select>
+
+						            <v-text-field v-model="itemDestinationLocation" dense label="Destination Location" readonly v-if="!creating">
+                        </v-text-field>
+
                     </v-col>
+                    <v-col>
+                      <!-- DATE -->
+                      <v-text-field class="right-input caption" v-model="transinfo.transdate" dense
+                        label="Date" :rules="dateRules" @change="transdateChanged" v-if="creating">
+                      </v-text-field>
+
+                      <v-text-field v-model="transinfo.transdate" dense label="Date" readonly v-if="!creating">
+                      </v-text-field>
+                    </v-col>
+
                     </v-row>
                     <v-row >
                         <v-col cols="12">
@@ -113,7 +134,7 @@
                                   <td>
                                       <v-btn class="caption" text light x-small v-if="creating"
                                         @click="removeItem(row.item)">
-                                        <v-icon color="green">mdi-delete-outline</v-icon>
+                                        <v-icon color="red">mdi-delete-outline</v-icon>
                                       </v-btn>
                                   </td>
                                   <td>{{row.item.itemcode}}</td>
@@ -270,7 +291,14 @@ export default {
       },
       selectedSourceItem: {
         _id: '',
+        itemdescrip: '',
+        itemcode: '',
+        totalpieces: 0,
       },
+      finalTransInfo: {
+        transitems: []
+      },
+      finalItems: [],
       transinfo: {
         transdate: '',
         transstatus: "Posted",
@@ -280,6 +308,7 @@ export default {
 		    status: "Posted",
         transtotal: 0,
         transitems: [],
+        itemsource: [],
 		    notes: "",
       },
       validsale: false,
@@ -290,14 +319,13 @@ export default {
         (v) => !!v || "Required",
         //v => (v && v.length <= 6) || 'Address ID must be 6 characters',
       ],
-	  dateRules: [
-		(v) => !!v || "Required",
-		v => (v && this.validateDate(v)) || 'Invalid Date',
-	  ],
-
+      dateRules: [
+        (v) => !!v || "Required",
+        v => (v && this.validateDate(v)) || 'Invalid Date',
+      ],
       headers: [
         // { text: "TransID", align: "center", value: "_id" },
-        { text: "Transactions", align: "start", value: "client.accountname" },
+        { text: "Transactions", align: "start", value: "transdate" },
       ],
       transitemsheader: [
         {  text: "", value: "x",  sortable: false, width: "5%",  fixed: true, class: 'dtheaderbg', align: 'center'},
@@ -323,7 +351,7 @@ export default {
   }, //end of data
 
   methods: {
-    ...mapMutations(["mutateZindex", "updateItemReceiveTrans"]),
+    ...mapMutations(["mutateZindex", "updateItemTransferTrans"]),
     tellParentToUpdate() {
       this.$emit("reupdateitemselllist");
     },
@@ -335,41 +363,125 @@ export default {
       console.log(this.transinfo.transitems);
 
     },
+
+    addtobasket() {
+      //verify if selected item totalpieces is not less than the desired transfer pieces
+      if(Number(this.selectedSourceItem.totalpieces) < Number(this.totalpieces))
+      {
+        this.snackbar = true;
+        this.snackbartext = "Destination Item Total Pieces must not be greater than Source Item Total Pieces";
+      }
+      else {
+        //before adding, find similar items already in the list
+        //based on itemcode, itemdescription and size
+        //and combine the number of pieces
+        let thereis = false;
+
+          for (let i = 0; i < this.transinfo.transitems.length; i++)
+          {
+            const item = this.transinfo.transitems[i];
+            if(item.itemdescrip == this.selectedSourceItem.itemdescrip
+              && item.itemcode == this.selectedSourceItem.itemcode
+              && item.size == this.itemsize)
+              {
+                //modify the existing item
+                thereis = true;
+                console.log(item);
+                this.combinequantities(i);
+                break;
+              }
+              };
+
+          if(!thereis)
+          {
+            this.itemcounter++;
+            //add new row to transaction items
+            this.transinfo.transitems.push({
+              _id: this.selectedSourceItem._id,
+              itemcounter: this.itemcounter,
+              itemlocation: this.itemDestinationLocation,
+              itemcode: this.selectedSourceItem.itemcode,
+              itemdescrip: this.selectedSourceItem.itemdescrip,
+              totalpieces: this.totalpieces,
+              totalinventory: this.totalpieces,
+              quantity: this.quantity,
+              itemsize: this.itemsize,
+              size: this.itemsize,
+              transtype: "Transfer",
+            });
+            //add also to sourceitems - negative inventory
+            this.transinfo.itemsource.push({
+              _id: this.selectedSourceItem._id,
+              itemcounter: this.itemcounter,
+              itemlocation: this.itemSourceLocation,
+              itemcode: this.selectedSourceItem.itemcode,
+              itemdescrip: this.selectedSourceItem.itemdescrip,
+              totalpieces: this.totalpieces,
+              totalinventory: Number(this.totalpieces) * -1,
+              quantity: this.quantity,
+              itemsize: this.itemsize,
+              size: this.itemsize,
+              transtype: "Transfer",
+            });
+          }
+          this.finalitems = this.transinfo.transitems.concat(this.transinfo.itemsource);
+          console.log(this.finalitems);
+          this.itemdialog = false;
+      }
+    },
+
+    combinequantities(itemindex){
+      this.transinfo.transitems[itemindex].quantity += this.quantity;
+      this.transinfo.transitems[itemindex].totalpieces += this.totalpieces;
+    },
+
     async savetransaction() {
       //can't do form validation here because there's another form in the middle
       //doing manual validation
       //if (Object.keys(this.transinfo.client).length === 0) {
-      if (this.transinfo.client.length <= 0) {
+      if (this.itemSourceLocation.length <= 0) {
         this.snackbar = true;
-        this.snackbartext = "Please select Client/Customer";
-      } else if (parseFloat(this.transinfo.transtotal) <= 0) {
+        this.snackbartext = "Please select Source Location";
+      } else if (parseFloat(this.itemDestinationLocation.length) <= 0) {
         this.snackbar = true;
-        this.snackbartext =
-          "There is no transaction to save based on the Totals";
+        this.snackbartext = "Please select Destination Location";
       }
-		else if(!this.validateDate(this.transinfo.transdate)){
-			this.snackbar = true;
-        this.snackbartext =
-          "Date is not valid.";
-		}
-	  else {
+      else if(!this.validateDate(this.transinfo.transdate)){
+        this.snackbar = true;
+        this.snackbartext = "Date is not valid.";
+      }
+      else if(this.transinfo.notes.length <= 0){
+        this.snackbar = true;
+        this.snackbartext = "Please input Notes / Remarks.";
+      }
+      else if(this.transinfo.transitems.length <= 0){
+        this.snackbar = true;
+        this.snackbartext = "There is no transaction to save.";
+      }
+
+	    else {
         this.snackbar = false;
         this.transinfo.pricecode = "Supplier Price";
-        this.transinfo.transtype = "ItemTransfer";
+        this.transinfo.transtype = "Item Transfer";
 
-        let res = await this.callApi("POST", "/itemselltrans", this.transinfo);
+        this.finalTransInfo = this.transinfo;
+        this.finalTransInfo.transitems = this.finalitems;
+
+        console.log(this.finalTransInfo);
+
+        let res = await this.callApi("POST", "/itemselltrans", this.finalTransInfo);
         console.log(res);
         if (res.data.created) {
+          this.creating = false;
           this.snackbar = true;
-          this.snackbartext = "Transaction Saved!";
-          //clear
-          this.$refs.receiveform.reset();
-          this.$refs.receiveform.resetValidation();
+          this.snackbartext = "Transfer Transaction Saved!";
+
           this.clearAll();
           //update list
           //this.tellParentToUpdate();
           this.getalltransactions();
-        } else {
+        }
+        else {
           this.snackbar = true;
           this.snackbartext = "Transaction Failed....";
         }
@@ -396,17 +508,22 @@ export default {
         this.snackbartext = "Destination Location must not be the same as Source Location";
         this.itemDestinationLocation = '';
       }
-      else{
+      else {
+        console.log(this.itemDestinationLocation);
         console.log('selecting destination location');
 
       }
     },
 
     async getalltransactions() {
-      let res = await this.callApi("GET", "/itemselltrans/ItemTransferlist");
+      let res = await this.callApi("GET", "/itemselltrans/itemtransferlist");
       console.log(res.data);
       if (res.data) {
-        this.updateItemReceiveTrans(res.data);
+        //format the date
+        res.data.forEach(element => {
+          element.transdate = moment(element.transdate).format('MM/DD/YYYY');
+        });
+        this.updateItemTransferTrans(res.data);
       } else {
         console.log("There are no transaction data.");
       }
@@ -451,13 +568,17 @@ export default {
       this.pricecode = "Supplier Price";
 
       //transaction
+      this.transinfo._id = '';
       this.itemcounter = 0;
       this.transinfo.transtotal = 0;
       this.transinfo.transitems = [];
       this.grandtotaldisplay = "0.0";
+      this.finalitems = [];
+      this.finalTransInfo = {};
+      this.itemSourceLocation = "";
+      this.itemDestinationLocation = "";
 
-
-      this.transinfo.client = "";
+      this.transinfo.client = "60c0e4ca879b195d4080b5e3";
       this.transinfo.clientname = "";
 
       this.transinfo.transtotal = 0;
@@ -500,30 +621,6 @@ export default {
       }).format(amt);
     },
 
-    addtobasket() {
-      //validation first
-      this.validsale = this.$refs.receiveform.validate();
-      if (this.validsale) {
-        this.itemcounter++;
-        //add new row to transaction items
-        this.transinfo.transitems.push({
-          _id: this.selecteditem._id,
-          itemcounter: this.itemcounter,
-          itemcode: this.selecteditem.itemcode,
-          itemdescrip: this.selecteditem.itemdescrip,
-          totalpieces: this.totalpieces,
-          totalinventory: this.totalpieces,
-          quantity: this.quantity,
-          itemsize: this.itemsize,
-          size: this.itemsize,
-          priceeach: this.priceeach,
-          priceeachdisplay: this.priceeachdisplay,
-          totalcost: this.totalcost,
-          totalcostdisplay: this.totalcostdisplay,
-        });
-        this.computetotal();
-      }
-    },
 
     autocompleteselectprofile(selected) {
       console.log(selected);
@@ -666,6 +763,8 @@ export default {
     selectSourceItem(item) {
       this.selectedSourceItem._id = item._id;
       this.selectedSourceItem.itemdescrip = item.itemdescrip;
+      this.selectedSourceItem.itemcode = item.itemcode;
+      this.selectedSourceItem.totalpieces = item.totalpieces;
 
     },
     selectSourceItemDialog(item) {
@@ -697,17 +796,26 @@ export default {
       {
         console.log(res.data);
         let info = res.data;
-        this.selectedtrans.clientname = info.client.accountname;
+        let theItems = [];
+        //remove the items with negative totalinventory
+        info.transitems.forEach(item => {
+          if(Number(item.totalinventory) > 0){
+            theItems.push(item);
+            this.itemDestinationLocation = item.itemlocation;
+          }
+        });
+        this.selectedtrans.clientname = '';
 
         this.transinfo._id = info._id;
         this.transinfo.transdate = moment(info.transdate).format('MM/DD/YYYY');
         this.transinfo.transstatus = info.transstatus;
 
-        this.transinfo.clientname = info.client.accountname;
+        this.transinfo.clientname = '';
         this.transinfo.transtotal = info.transtotal;
         this.grandtotaldisplay = this.currencyformat(info.transtotal);
-        this.transinfo.transitems = info.transitems;
+        this.transinfo.transitems = theItems;
         this.transinfo.notes = info.notes;
+
       }
       else
       {

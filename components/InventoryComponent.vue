@@ -25,6 +25,13 @@
                 :rules="dateRules" >
                 </v-text-field>
             </v-col> -->
+            <v-col>
+              <!-- ITEM LOCATION -->
+                <v-select v-model="itemLocation" dense :items="this.$store.state.itemlocations"
+                  label="Item Location"  item-text="location" class="centered-input caption"
+                  item-value="location" @change="selectItemLocation">
+              </v-select>
+            </v-col>
             <v-col cols="1">
                 <v-btn @click="getInventoryData" color="primary" small> Load Inventory </v-btn>
             </v-col>
@@ -99,6 +106,7 @@
     data: function () {
       return {
         showdialog: false,
+        itemLocation: '',
         search: '',
         snackbar: false,
         snackbartext: '',
@@ -110,12 +118,13 @@
         inventoryData: [ ],
         historyData: [ ],
         headers: [
-          { text: 'Code', value: '_id',},
+          { text: 'Code', value: '_id'},
           { text: 'Item Description', value: 'itemdescrip',},
           { text: 'Pieces', value: 'totalpieces' },
         ],
         historyHeaders: [
-          { text: 'Date', value: 'transdate',},
+          { text: 'Transaction', value: 'transtype'},
+          { text: 'Date', value: 'transdate'},
           { text: 'Pieces', value: 'totalinventory' },
         ],
           positions: {
@@ -144,10 +153,16 @@
         this.showdialog = true;
         this.getHistoryData(item._id);
       },
+
+
+
       async getInventoryData() {
+        if(this.itemLocation.length <= 0){
+          this.itemLocation = "Warehouse";
+        }
         this.inventoryData = [];
         console.log('Getting inventory data...');
-        let res = await this.callApi("POST", "/iteminventory/inventorycount", {filters: this.filters});
+        let res = await this.callApi("POST", "/iteminventory/inventorycount/"+this.itemLocation);
 
         if(Array.isArray(res.data))
         {
@@ -168,7 +183,8 @@
       async getHistoryData(itemcode) {
         this.historyData = [];
         console.log('Getting history data...');
-        let res = await this.callApi("GET", "/iteminventory/itemhistory/"+itemcode,);
+        //let res = await this.callApi("GET", "/iteminventory/itemhistory/"+itemcode,);
+        let res = await this.callApi("GET", "/iteminventory/itemhistory/"+itemcode+"/"+this.itemLocation);
         console.log(res);
         if(Array.isArray(res.data))
         {
@@ -185,6 +201,9 @@
           this.snackbartext = "There is no data to load."
         }
 
+      },
+      async selectItemLocation(location) {
+        this.getInventoryData(location)
       },
       validateDate(dt){
         var m = moment(dt, 'MM/DD/YYYY');
