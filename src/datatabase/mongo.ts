@@ -13,6 +13,7 @@ import ItemSellTrans from "../models/itemselltrans.model";
 import ItemSellTransItem from "../models/itemselltransitems.model";
 import ItemInventory from "../models/iteminventory.model";
 import ItemLocation from "../models/itemlocations.model";
+import UserInfo from "../models/userinfo.model";
 
 export const mongoOptions = {
   connectionString: env.mongo_conn,
@@ -38,5 +39,6 @@ export const mongoOptions = {
     ItemSellTrans,
     ItemInventory,
     ItemLocation,
+    UserInfo,
   ],
 };

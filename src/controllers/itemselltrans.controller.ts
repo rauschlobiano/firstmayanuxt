@@ -9,6 +9,7 @@ export class ItemselltransController {
 
   @Post()
   async createItemselltrans({ body }: MayaJsContext): Promise<any> {
+    delete body._id;
     body.createdBy = "Manual edit";
     body.editedBy = "Manual edit";
     return await this.services.savetransaction(body);
@@ -29,6 +30,10 @@ export class ItemselltransController {
   @Get("/receivinglist")
   async readItemreceivetranslist(): Promise<any> {
     return await this.services.getallreceivingtransactionslist();
+  }
+  @Get("/itemtransferlist")
+  async readItemTransferlist(): Promise<any> {
+    return await this.services.getallitemtransferlist();
   }
   @Post("/reporttrans")
   async reporttranslist({ body }: MayaJsContext): Promise<any> {

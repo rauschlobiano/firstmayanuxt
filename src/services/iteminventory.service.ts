@@ -12,12 +12,14 @@ export class IteminventoryServices {
   constructor(private mongo: MongoDbServices) {}
 
   //returns all items
-  async getAllItemInventory() {
+  async getAllItemInventory(params: {}) {
     return await this.transItems.aggregate([
+      { $match: params },
       {
         $group: {
           _id: "$itemcode",
           itemdescrip: { $first: "$itemdescrip" },
+          transtype: { $first: "$transtype" },
           totalpieces: { $sum: "$totalinventory" },
         },
       },

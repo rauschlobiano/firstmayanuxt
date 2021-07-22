@@ -46,6 +46,12 @@ export class ItemselltransServices {
       .find({ transtype: "Receiving" }, { transno: 1, client: 1 })
       .populate([{ path: "client" }]);
   }
+  async getallitemtransferlist() {
+    return await this.model.find(
+      { transtype: "Item Transfer" },
+      { transdate: 1 }
+    );
+  }
 
   async getallreporttrans(body: { filters: { dateFrom: ""; dateTo: "" } }) {
     //report for all selling transaction based on date

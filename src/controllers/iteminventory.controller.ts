@@ -13,9 +13,9 @@ export class IteminventoryController {
     return { message: "From IteminventoryController POST route", body };
   }
 
-  @Post("inventorycount")
-  async getInventory() {
-    return this.services.getAllItemInventory();
+  @Post("inventorycount/:itemlocation")
+  async getInventory({ params }: MayaJsContext) {
+    return this.services.getAllItemInventory(params);
   }
 
   @Get()
@@ -32,7 +32,7 @@ export class IteminventoryController {
       params,
     };
   }
-  @Get("/itemhistory/:itemcode")
+  @Get("/itemhistory/:itemcode/:itemlocation")
   async readIteminventoryByCode({ params }: MayaJsContext): Promise<any> {
     return this.services.getItemHistory(params);
   }

@@ -7,6 +7,7 @@ import { ItemsizepiecesController } from "./controllers/itemsizepieces.controlle
 import { ItemsizesController } from "./controllers/itemsizes.controller";
 import { ProfilesController } from "./controllers/profiles.controller";
 import { TaggingsController } from "./controllers/taggings.controller";
+import { UserinfoController } from "./controllers/userinfo.controller";
 
 export const routes = [
   {
@@ -44,5 +45,9 @@ export const routes = [
   {
     path: "itemlocations",
     controller: ItemlocationsController,
+  },
+  {
+    path: "userinfo",
+    controller: UserinfoController,
   },
 ];

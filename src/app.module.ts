@@ -10,6 +10,8 @@ import { ItemsController } from "./controllers/items.controller";
 import { TaggingsController } from "./controllers/taggings.controller";
 import { ItemsizesController } from "./controllers/itemsizes.controller";
 import { ItemsizepiecesServices } from "./services/itemsizepieces.service";
+import { UserinfoController } from "./controllers/userinfo.controller";
+import { ItemlocationsController } from "./controllers/itemlocations.controller";
 //services
 import { ProfilesServices } from "./services/profiles.service";
 import { ItemsServices } from "./services/items.service";
@@ -22,8 +24,10 @@ import { ItemselltransController } from "./controllers/itemselltrans.controller"
 import { ItemselltransServices } from "./services/itemselltrans.service";
 import { IteminventoryController } from "./controllers/iteminventory.controller";
 import { IteminventoryServices } from "./services/iteminventory.service";
-import { ItemlocationsController } from "./controllers/itemlocations.controller";
+
 import { ItemlocationsServices } from "./services/itemlocations.service";
+
+import { UserinfoServices } from "./services/userinfo.service";
 
 @Module({
   declarations: [
@@ -37,6 +41,7 @@ import { ItemlocationsServices } from "./services/itemlocations.service";
     ItemselltransController,
     IteminventoryController,
     ItemlocationsController,
+    UserinfoController,
   ],
   imports: [RouterModule.forRoot(routes), MongoDbModule.forRoot(mongoOptions)],
   providers: [
@@ -50,6 +55,7 @@ import { ItemlocationsServices } from "./services/itemlocations.service";
     ItemselltransServices,
     IteminventoryServices,
     ItemlocationsServices,
+    UserinfoServices,
   ],
   bootstrap: AppController,
 })

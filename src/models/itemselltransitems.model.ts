@@ -13,6 +13,9 @@ export default {
       itemcode: {
         type: String,
       },
+      transtype: {
+        type: String,
+      },
       transdate: {
         type: Date,
       },
