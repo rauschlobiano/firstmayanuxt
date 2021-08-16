@@ -121,3 +121,15 @@ input::placeholder {
   padding-bottom: 5px;
   background-color: rgb(154, 32, 170);
 }
+#draggable-container-account {
+  position: absolute;
+  z-index: 9;
+  width: 600px;
+}
+#draggable-header-account {
+  z-index: 10;
+  padding-left: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background-color: rgb(154, 32, 170);
+}

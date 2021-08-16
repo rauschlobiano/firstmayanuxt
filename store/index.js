@@ -3,6 +3,8 @@ export const state = () => ({
   stateshowprofile: false,
   counter: 123,
   userinfo: {},
+  userid: '',
+  usertoken: '',
   legituser: false,
   profileslistdata: [],
   profilesarray: [],
@@ -113,7 +115,13 @@ export const mutations = {
     state.itemlocations = newlist
   },
   updateUserInfo(state, newinfo){
-    state.userinfo = newinfo
+    state.userinfo = newinfo;
+  },
+  updateUserId(state, newinfo){
+    state.userid = newinfo;
+  },
+  updateUserToken(state, newinfo){
+    state.usertoken = newinfo;
   },
   updateLegitUser(state, newinfo){
     state.legituser = newinfo

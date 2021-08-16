@@ -1,11 +1,6 @@
 <template>
   <v-app>
-    <div
-      ref="draggableContainerItem"
-      id="draggable-container-item"
-      class="pa-0"
-      @click="incrementZindex"
-    >
+    <div ref="draggableContainerItem" id="draggable-container-item" class="pa-0" @click="incrementZindex">
       <v-card elevation="2" :min-width="900" v-if="showflag">
         <div id="draggable-header-item" @mousedown="dragMouseDown">
           <v-row>
@@ -14,13 +9,7 @@
             </v-col>
             <v-spacer> </v-spacer>
             <v-col cols="1" class="text-right">
-              <v-btn
-                x-small
-                icon
-                dark
-                @click="tellParentToHideThis"
-                class="mr-1"
-              >
+              <v-btn x-small icon dark @click="tellParentToHideThis" class="mr-1">
                 <v-icon>mdi-power</v-icon>
               </v-btn>
             </v-col>
@@ -30,13 +19,7 @@
         <v-container>
           <v-row>
             <v-col cols="5">
-              <v-text-field
-                v-model="search"
-                append-icon="mdi-magnify"
-                label="Search"
-                single-line
-                hide-details
-              ></v-text-field>
+              <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details></v-text-field>
 
               <v-data-table
                 height="500px"
@@ -57,7 +40,7 @@
                       :key="item._id"
                       @click="selectItem(item)"
                       :class="{
-                        selectedRow: item._id == iteminfo._id,
+                        selectedRow: item._id == iteminfo._id
                       }"
                     >
                       <td>{{ item.itemdescrip }}</td>
@@ -72,27 +55,10 @@
                 <v-spacer></v-spacer>
                 <v-col cols="12" md="4">
                   <div class="text-right">
-                    <v-btn
-                      class="mr-1"
-                      x-small
-                      light
-                      fab
-                      color="primary"
-                      @click="createnew"
-                      v-if="!creating"
-                      depressed
-                    >
+                    <v-btn class="mr-1" x-small light fab color="primary" @click="createnew" v-if="!creating" depressed>
                       <v-icon>mdi-plus</v-icon>
                     </v-btn>
-                    <v-btn
-                      x-small
-                      light
-                      fab
-                      color="error"
-                      @click="showdialog = true"
-                      v-if="!creating"
-                      depressed
-                    >
+                    <v-btn x-small light fab color="error" @click="showdialog = true" v-if="!creating" depressed>
                       <v-icon>mdi-minus</v-icon>
                     </v-btn>
                   </div>
@@ -167,15 +133,7 @@
                     <v-card flat>
                       <v-row>
                         <v-col class="text-right">
-                          <v-btn
-                            class="mr-1"
-                            x-small
-                            light
-                            fab
-                            color="info"
-                            @click="createnewitemsize"
-                            depressed
-                          >
+                          <v-btn class="mr-1" x-small light fab color="info" @click="createnewitemsize" depressed>
                             <v-icon>mdi-plus</v-icon>
                           </v-btn>
                         </v-col>
@@ -196,8 +154,7 @@
                               :key="item._id"
                               @click="selectItemSizePiece(item)"
                               :class="{
-                                selectedRow:
-                                  item._id == selecteditemsizepiece._id,
+                                selectedRow: item._id == selecteditemsizepiece._id
                               }"
                             >
                               <td>{{ item.itemsize }}</td>
@@ -213,15 +170,7 @@
                     <v-card flat>
                       <v-row>
                         <v-col class="text-right">
-                          <v-btn
-                            class="mr-1"
-                            x-small
-                            light
-                            fab
-                            color="info"
-                            @click="createnewitemprice"
-                            depressed
-                          >
+                          <v-btn class="mr-1" x-small light fab color="info" @click="createnewitemprice" depressed>
                             <v-icon>mdi-plus</v-icon>
                           </v-btn>
                         </v-col>
@@ -242,7 +191,7 @@
                               :key="item._id"
                               @click="selectItemPrice(item)"
                               :class="{
-                                selectedRow: item._id == selecteditemprice._id,
+                                selectedRow: item._id == selecteditemprice._id
                               }"
                             >
                               <td>{{ item.pricecode }}</td>
@@ -256,26 +205,14 @@
                 </v-tabs-items>
               </v-row>
 
-              <v-btn
-                color="success"
-                small
-                @click="saveitem"
-                v-if="creating"
-                :disabled="!valid"
-                depressed
-                bottom
-                right
-                absolute
-              >
+              <v-btn color="success" small @click="saveitem" v-if="creating" :disabled="!valid" depressed bottom right absolute>
                 <v-icon small>mdi-content-save</v-icon> Save
               </v-btn>
 
               <v-row dense v-if="!creating" class="font-weight-light mt-4">
                 <v-spacer></v-spacer>
                 Last Updated by
-                <span class="font-weight-bold mx-1">
-                  {{ iteminfo.editedBy }}</span
-                >
+                <span class="font-weight-bold mx-1"> {{ iteminfo.editedBy }}</span>
                 on {{ iteminfo.updatedAt }}
               </v-row>
             </v-col>
@@ -284,12 +221,7 @@
           <v-dialog v-model="itemdialog" height="300" width="400">
             <v-card>
               <h4 class="ml-2">Item Size Details</h4>
-              <v-form
-                v-model="valideditsize"
-                ref="formeditsize"
-                lazy-validation
-                class="mt-3"
-              >
+              <v-form v-model="valideditsize" ref="formeditsize" lazy-validation class="mt-3">
                 <v-container>
                   <v-row dense>
                     <v-col cols="6">
@@ -317,17 +249,9 @@
                 </v-container>
               </v-form>
               <v-card-actions>
-                <v-btn
-                  color="red"
-                  text
-                  @click="deleteitemsize"
-                  v-if="!creatingitemsize"
-                  >Delete</v-btn
-                >
+                <v-btn color="red" text @click="deleteitemsize" v-if="!creatingitemsize">Delete</v-btn>
                 <v-spacer></v-spacer>
-                <v-btn color="green darken-1" text @click="saveitemsize">
-                  Save</v-btn
-                >
+                <v-btn color="green darken-1" text @click="saveitemsize"> Save</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -335,12 +259,7 @@
           <v-dialog v-model="itempricedialog" height="300" width="400">
             <v-card>
               <h4 class="ml-2">Item Price Details</h4>
-              <v-form
-                v-model="valideditprice"
-                ref="formeditprice"
-                lazy-validation
-                class="mt-3"
-              >
+              <v-form v-model="valideditprice" ref="formeditprice" lazy-validation class="mt-3">
                 <v-container>
                   <v-row dense>
                     <v-col cols="6">
@@ -355,31 +274,16 @@
                       </v-select>
                     </v-col>
                     <v-col cols="6">
-                      <v-text-field
-                        type="number"
-                        dense
-                        v-model="selecteditemprice.price"
-                        :counter="8"
-                        :rules="priceRules"
-                        label="Price"
-                      >
+                      <v-text-field type="number" dense v-model="selecteditemprice.price" :counter="8" :rules="priceRules" label="Price">
                       </v-text-field>
                     </v-col>
                   </v-row>
                 </v-container>
               </v-form>
               <v-card-actions>
-                <v-btn
-                  color="red"
-                  text
-                  @click="deleteitemprice"
-                  v-if="!creatingitemprice"
-                  >Delete</v-btn
-                >
+                <v-btn color="red" text @click="deleteitemprice" v-if="!creatingitemprice">Delete</v-btn>
                 <v-spacer></v-spacer>
-                <v-btn color="green darken-1" text @click="saveitemprice"
-                  >Save</v-btn
-                >
+                <v-btn color="green darken-1" text @click="saveitemprice">Save</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -426,14 +330,9 @@ import moment from "moment";
 export default {
   name: "ItemComponent",
   props: ["showflag"],
-  data: function () {
+  data: function() {
     return {
-      ...mapState([
-        "counter",
-        "lastzindex",
-        "itemslistdata",
-        "vendorslistdata",
-      ]),
+      ...mapState(["counter", "lastzindex", "itemslistdata", "vendorslistdata"]),
       valid: false,
       valideditsize: false,
       valideditprice: false,
@@ -454,13 +353,13 @@ export default {
         _id: "",
         item_id: "",
         price: 0,
-        pricecode: "",
+        pricecode: ""
       },
       selecteditemsizepiece: {
         _id: "",
         item_id: "",
         itemsize: "",
-        pieces: 0,
+        pieces: 0
       },
       iteminfo: {
         _id: "",
@@ -470,18 +369,18 @@ export default {
         supplierprofid: "",
         active: true,
         updatedAt: "",
-        editedBy: "",
+        editedBy: ""
       },
       inputRules: [
-        (v) => !!v || "Address ID is required",
+        v => !!v || "Address ID is required"
         //v => (v && v.length <= 6) || 'Address ID must be 6 characters',
       ],
       pieceRules: [
-        (v) => !!v || "Piece/s is required",
+        v => !!v || "Piece/s is required"
         //v => (v && v.length <= 6) || 'Address ID must be 6 characters',
       ],
       priceRules: [
-        (v) => !!v || "Piece/s is required",
+        v => !!v || "Piece/s is required"
         //v => (v && v.length <= 6) || 'Address ID must be 6 characters',
       ],
       // numberRules: [
@@ -496,35 +395,27 @@ export default {
       headers: [{ text: "Description", align: "start", value: "itemdescrip" }],
       headerssizepiece: [
         { text: "Size", align: "start", value: "itemsize" },
-        { text: "Pieces", align: "start", value: "pieces" },
+        { text: "Pieces", align: "start", value: "pieces" }
       ],
       headersprice: [
         { text: "Price Code", align: "start", value: "pricecode" },
-        { text: "Price", align: "start", value: "price" },
+        { text: "Price", align: "start", value: "price" }
       ],
       positions: {
         clientX: undefined,
         clientY: undefined,
         movementX: 0,
-        movementY: 0,
-      },
+        movementY: 0
+      }
     };
   },
 
   methods: {
-    ...mapMutations([
-      "incrementCounter",
-      "closeProfile",
-      "mutateZindex",
-      "updateItemSizePiece",
-    ]),
+    ...mapMutations(["incrementCounter", "closeProfile", "mutateZindex", "updateItemSizePiece"]),
 
     async getSizePiece() {
       try {
-        let res = await this.callApi(
-          "GET",
-          "/itemsizepieces/specificsizepiece/" + this.iteminfo._id
-        );
+        let res = await this.callApi("GET", "/itemsizepieces/specificsizepiece/" + this.iteminfo._id);
         this.itemsizepiecelocal = res.data;
       } catch (ex) {
         console.log(ex);
@@ -533,10 +424,7 @@ export default {
 
     async getPrices() {
       try {
-        let res = await this.callApi(
-          "GET",
-          "/itemprices/specificprice/" + this.iteminfo._id
-        );
+        let res = await this.callApi("GET", "/itemprices/specificprice/" + this.iteminfo._id);
         this.itempricelocal = res.data;
       } catch (ex) {
         console.log(ex);
@@ -574,30 +462,18 @@ export default {
         try {
           if (!this.creatingitemsize) {
             //UPDATING
-            let res = await this.callApi(
-              "PATCH",
-              "/itemsizepieces/" + this.selecteditemsizepiece._id,
-              this.selecteditemsizepiece
-            );
+            let res = await this.callApi("PATCH", "/itemsizepieces/" + this.selecteditemsizepiece._id, this.selecteditemsizepiece);
             if (res.data.updated == true) {
               this.itemdialog = false;
               //update also the local list
-              this.itemsizepiecelocal.find(
-                (x) => x._id === this.selecteditemsizepiece._id
-              ).itemsize = this.selecteditemsizepiece.itemsize;
-              this.itemsizepiecelocal.find(
-                (x) => x._id === this.selecteditemsizepiece._id
-              ).pieces = this.selecteditemsizepiece.pieces;
+              this.itemsizepiecelocal.find(x => x._id === this.selecteditemsizepiece._id).itemsize = this.selecteditemsizepiece.itemsize;
+              this.itemsizepiecelocal.find(x => x._id === this.selecteditemsizepiece._id).pieces = this.selecteditemsizepiece.pieces;
               //update the parent
               this.tellParentToUpdateItemSize();
             }
           } else {
             //CREATING
-            let res = await this.callApi(
-              "POST",
-              "/itemsizepieces",
-              this.selecteditemsizepiece
-            );
+            let res = await this.callApi("POST", "/itemsizepieces", this.selecteditemsizepiece);
             if (res.data.created == true) {
               this.itemdialog = false;
               this.creatingitemsize = false;
@@ -617,28 +493,16 @@ export default {
         try {
           if (!this.creatingitemprice) {
             //UPDATING
-            let res = await this.callApi(
-              "PATCH",
-              "/itemprices/" + this.selecteditemprice._id,
-              this.selecteditemprice
-            );
+            let res = await this.callApi("PATCH", "/itemprices/" + this.selecteditemprice._id, this.selecteditemprice);
             if (res.data.updated == true) {
               this.itempricedialog = false;
               //update also the local list
-              this.itempricelocal.find(
-                (x) => x._id === this.selecteditemprice._id
-              ).price = this.selecteditemprice.price;
-              this.itempricelocal.find(
-                (x) => x._id === this.selecteditemprice._id
-              ).pricecode = this.selecteditemprice.pricecode;
+              this.itempricelocal.find(x => x._id === this.selecteditemprice._id).price = this.selecteditemprice.price;
+              this.itempricelocal.find(x => x._id === this.selecteditemprice._id).pricecode = this.selecteditemprice.pricecode;
             }
           } else {
             //CREATING
-            let res = await this.callApi(
-              "POST",
-              "/itemprices",
-              this.selecteditemprice
-            );
+            let res = await this.callApi("POST", "/itemprices", this.selecteditemprice);
             if (res.data.created == true) {
               this.itempricedialog = false;
               this.creatingitemprice = false;
@@ -654,34 +518,26 @@ export default {
 
     async deleteitemprice() {
       //DELETING
-      let res = await this.callApi(
-        "DELETE",
-        "/itemprices/" + this.selecteditemprice._id
-      );
+      let res = await this.callApi("DELETE", "/itemprices/" + this.selecteditemprice._id);
       if (res.data == true) {
         this.itempricedialog = false;
         this.creatingitemprice = false;
         //delete the deleted itemsizepiece
         let todelete = this.selecteditemprice._id;
-        this.itempricelocal = this.itempricelocal.filter(function (obj) {
+        this.itempricelocal = this.itempricelocal.filter(function(obj) {
           return obj._id !== todelete;
         });
       }
     },
     async deleteitemsize() {
       //DELETING
-      let res = await this.callApi(
-        "DELETE",
-        "/itemsizepieces/" + this.selecteditemsizepiece._id
-      );
+      let res = await this.callApi("DELETE", "/itemsizepieces/" + this.selecteditemsizepiece._id);
       if (res.data == true) {
         this.itemdialog = false;
         this.creatingitemsize = false;
         //delete the deleted itemsizepiece
         let todelete = this.selecteditemsizepiece._id;
-        this.itemsizepiecelocal = this.itemsizepiecelocal.filter(function (
-          obj
-        ) {
+        this.itemsizepiecelocal = this.itemsizepiecelocal.filter(function(obj) {
           return obj._id !== todelete;
         });
       }
@@ -711,11 +567,7 @@ export default {
         this.valid = this.$refs.form.validate();
         if (this.valid) {
           try {
-            let res = await this.callApi(
-              "PATCH",
-              "/items/" + this.iteminfo._id,
-              this.iteminfo
-            );
+            let res = await this.callApi("PATCH", "/items/" + this.iteminfo._id, this.iteminfo);
             console.log(res);
             if (res) {
               this.tellParentToUpdate();
@@ -732,11 +584,7 @@ export default {
       console.log("deleting item...");
       if (!this.creating) {
         try {
-          let res = await this.callApi(
-            "DELETE",
-            "/items/" + this.iteminfo._id,
-            {}
-          );
+          let res = await this.callApi("DELETE", "/items/" + this.iteminfo._id, {});
           console.log(res);
           if (res.data) {
             this.snackbar = true;
@@ -761,7 +609,7 @@ export default {
     dollarformat(amt) {
       return new Intl.NumberFormat("en", {
         currency: "USD",
-        style: "currency",
+        style: "currency"
       }).format(amt);
     },
 
@@ -771,9 +619,7 @@ export default {
       this.iteminfo.itemcode = item.itemcode;
       this.iteminfo.itemdescrip = item.itemdescrip;
       this.iteminfo.supplierprofid = item.supplierprofid;
-      this.iteminfo.updatedAt = item.updatedAt
-        ? moment(item.updatedAt).format("MMM DD yyyy hh:mm:ss A")
-        : "";
+      this.iteminfo.updatedAt = item.updatedAt ? moment(item.updatedAt).format("MMM DD yyyy hh:mm:ss A") : "";
       this.iteminfo.editedBy = item.editedBy;
 
       this.creating = false;
@@ -822,10 +668,8 @@ export default {
     incrementZindex() {
       //if form is still shown
       if (this.showflag) {
-        document.getElementById("draggable-container-item").style.zIndex =
-          this.$store.state.lastzindex + 1;
-        document.getElementById("draggable-header-item").style.zIndex =
-          this.$store.state.lastzindex + 2;
+        document.getElementById("draggable-container-item").style.zIndex = this.$store.state.lastzindex + 1;
+        document.getElementById("draggable-header-item").style.zIndex = this.$store.state.lastzindex + 2;
         this.mutateZindex();
       }
     },
@@ -838,7 +682,7 @@ export default {
       this.$emit("formclose", false);
     },
 
-    dragMouseDown: function (event) {
+    dragMouseDown: function(event) {
       event.preventDefault();
       // get the mouse cursor position at startup:
       this.positions.clientX = event.clientX;
@@ -847,27 +691,21 @@ export default {
       document.onmouseup = this.closeDragElement;
     },
 
-    elementDrag: function (event) {
+    elementDrag: function(event) {
       event.preventDefault();
       this.positions.movementX = this.positions.clientX - event.clientX;
       this.positions.movementY = this.positions.clientY - event.clientY;
       this.positions.clientX = event.clientX;
       this.positions.clientY = event.clientY;
       // set the element's new position:
-      this.$refs.draggableContainerItem.style.top =
-        this.$refs.draggableContainerItem.offsetTop -
-        this.positions.movementY +
-        "px";
-      this.$refs.draggableContainerItem.style.left =
-        this.$refs.draggableContainerItem.offsetLeft -
-        this.positions.movementX +
-        "px";
+      this.$refs.draggableContainerItem.style.top = this.$refs.draggableContainerItem.offsetTop - this.positions.movementY + "px";
+      this.$refs.draggableContainerItem.style.left = this.$refs.draggableContainerItem.offsetLeft - this.positions.movementX + "px";
     },
 
     closeDragElement() {
       document.onmouseup = null;
       document.onmousemove = null;
-    },
+    }
   },
   watch: {
     itemdialog(a) {
@@ -883,12 +721,11 @@ export default {
         this.selecteditemprice.pricecode = "Base Price";
         this.selecteditemprice.price = 1;
       }
-    },
+    }
   },
   async created() {},
-  computed: {},
+  computed: {}
 };
 </script>
 
-<style>
-</style>
+<style></style>
