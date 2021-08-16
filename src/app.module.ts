@@ -12,22 +12,24 @@ import { ItemsizesController } from "./controllers/itemsizes.controller";
 import { ItemsizepiecesServices } from "./services/itemsizepieces.service";
 import { UserinfoController } from "./controllers/userinfo.controller";
 import { ItemlocationsController } from "./controllers/itemlocations.controller";
+import { ItemsizepiecesController } from "./controllers/itemsizepieces.controller";
+import { ItempricesController } from "./controllers/itemprices.controller";
+import { IteminventoryController } from "./controllers/iteminventory.controller";
+import { ItemselltransController } from "./controllers/itemselltrans.controller";
+import { LoginsController } from "./controllers/logins.controller";
+import { PermissionController } from "./controllers/permission.controller";
 //services
 import { ProfilesServices } from "./services/profiles.service";
 import { ItemsServices } from "./services/items.service";
 import { TaggingsServices } from "./services/taggings.service";
 import { ItemsizesServices } from "./services/itemsizes.service";
-import { ItemsizepiecesController } from "./controllers/itemsizepieces.controller";
-import { ItempricesController } from "./controllers/itemprices.controller";
 import { ItempricesServices } from "./services/itemprices.service";
-import { ItemselltransController } from "./controllers/itemselltrans.controller";
 import { ItemselltransServices } from "./services/itemselltrans.service";
-import { IteminventoryController } from "./controllers/iteminventory.controller";
 import { IteminventoryServices } from "./services/iteminventory.service";
-
 import { ItemlocationsServices } from "./services/itemlocations.service";
-
 import { UserinfoServices } from "./services/userinfo.service";
+import { LoginsServices } from "./services/logins.service";
+import { PermissionServices } from "./services/permission.service";
 
 @Module({
   declarations: [
@@ -42,6 +44,8 @@ import { UserinfoServices } from "./services/userinfo.service";
     IteminventoryController,
     ItemlocationsController,
     UserinfoController,
+    LoginsController,
+    PermissionController,
   ],
   imports: [RouterModule.forRoot(routes), MongoDbModule.forRoot(mongoOptions)],
   providers: [
@@ -56,6 +60,8 @@ import { UserinfoServices } from "./services/userinfo.service";
     IteminventoryServices,
     ItemlocationsServices,
     UserinfoServices,
+    LoginsServices,
+    PermissionServices,
   ],
   bootstrap: AppController,
 })

@@ -5,6 +5,7 @@ import { ItemsController } from "./controllers/items.controller";
 import { ItemselltransController } from "./controllers/itemselltrans.controller";
 import { ItemsizepiecesController } from "./controllers/itemsizepieces.controller";
 import { ItemsizesController } from "./controllers/itemsizes.controller";
+import { PermissionController } from "./controllers/permission.controller";
 import { ProfilesController } from "./controllers/profiles.controller";
 import { TaggingsController } from "./controllers/taggings.controller";
 import { UserinfoController } from "./controllers/userinfo.controller";
@@ -49,5 +50,9 @@ export const routes = [
   {
     path: "userinfo",
     controller: UserinfoController,
+  },
+  {
+    path: "permissions",
+    controller: PermissionController,
   },
 ];

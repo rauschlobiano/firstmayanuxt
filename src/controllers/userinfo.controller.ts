@@ -2,10 +2,16 @@ import { Get, Patch, Post, Delete, Put } from "@mayajs/common";
 import { MayaJsContext } from "@mayajs/router";
 import { Controller } from "@mayajs/core";
 import { UserinfoServices } from "../services/userinfo.service";
+import { LoginsServices } from "../services/logins.service";
+import publicIp from "public-ip";
+import os from "os";
 
 @Controller()
 export class UserinfoController {
-  constructor(private services: UserinfoServices) {}
+  constructor(
+    private services: UserinfoServices,
+    private loginservice: LoginsServices
+  ) {}
 
   @Post()
   async createUserinfo({ body }: MayaJsContext): Promise<any> {
@@ -18,13 +24,39 @@ export class UserinfoController {
   }
   @Post("/login")
   async loginUser({ body }: MayaJsContext): Promise<any> {
-    return this.services.login(body);
+    console.log(os.hostname());
+    console.log(os.platform());
+    // const id = await getHWID();
+    // console.log(id);
+
+    body.status = false;
+    body.logType = "login";
+    await publicIp.v4().then((ip) => (body.publicIP = ip));
+
+    let attempt = await this.services.login(body);
+    //record the login attempt
+    if (attempt?.status === "ok") body.status = true;
+    await this.loginservice.recordIpAddress(body);
+
+    return attempt;
   }
 
-  @Get()
-  async readUserinfo(): Promise<any> {
-    // Read all Userinfo list
-    return { message: "ataya" };
+  @Post("/logout")
+  async logoutUser({ body }: MayaJsContext): Promise<any> {
+    console.log(body);
+
+    body.status = true;
+    body.logType = "logout";
+    await publicIp.v4().then((ip) => (body.publicIP = ip));
+
+    await this.loginservice.recordIpAddress(body);
+
+    return { message: "logout" };
+  }
+
+  @Post("/getuser")
+  async readUserinfo({ body }: MayaJsContext): Promise<any> {
+    return this.services.getUserInfo(body);
   }
 
   @Get("/:id")

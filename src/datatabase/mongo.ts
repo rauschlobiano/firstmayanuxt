@@ -14,6 +14,8 @@ import ItemSellTransItem from "../models/itemselltransitems.model";
 import ItemInventory from "../models/iteminventory.model";
 import ItemLocation from "../models/itemlocations.model";
 import UserInfo from "../models/userinfo.model";
+import Login from "../models/logins.model";
+import Permission from "../models/permissions.model";
 
 export const mongoOptions = {
   connectionString: env.mongo_conn,
@@ -40,5 +42,7 @@ export const mongoOptions = {
     ItemInventory,
     ItemLocation,
     UserInfo,
+    Login,
+    Permission,
   ],
 };
