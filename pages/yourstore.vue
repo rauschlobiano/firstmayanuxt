@@ -4,6 +4,7 @@
       <v-toolbar-title>Valhalla Online Services</v-toolbar-title>
       <h1 class="mx-4" style="color: gray">|</h1>
 
+<<<<<<< HEAD:pages/yourstore.vue
 <div v-if="loggedin">
   <v-row justify="end">
       <v-tooltip bottom style="z-index: 1000;">
@@ -87,16 +88,104 @@
 </v-row>
 </div>
 
+=======
+      <div v-if="loggedin">
+        <v-row justify="center">
+          <v-col class="text-center">
+            <v-tooltip bottom style="z-index: 1000;">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn @click="backtohome" icon v-bind="attrs" v-on="on">
+                  <v-icon>mdi-home</v-icon>
+                </v-btn>
+              </template>
+              <span>Home</span>
+            </v-tooltip>
+
+            <v-tooltip bottom style="z-index: 1000;">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn @click="clickProfile" icon v-bind="attrs" v-on="on">
+                  <v-icon>mdi-account-group</v-icon>
+                </v-btn>
+              </template>
+              <span>Profiles</span>
+            </v-tooltip>
+
+            <v-tooltip bottom style="z-index: 1000;">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn @click="clickItem" icon v-bind="attrs" v-on="on">
+                  <v-icon>mdi-cart</v-icon>
+                </v-btn>
+              </template>
+              <span>Items</span>
+            </v-tooltip>
+
+            <v-tooltip bottom style="z-index: 1000;">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn @click="clickInventoryIn" icon v-bind="attrs" v-on="on">
+                  <v-icon>mdi-truck</v-icon>
+                </v-btn>
+              </template>
+              <span>Receiving</span>
+            </v-tooltip>
+
+            <v-tooltip bottom style="z-index: 1000;">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn @click="clickItemTransfer" icon v-bind="attrs" v-on="on">
+                  <v-icon>mdi-transfer</v-icon>
+                </v-btn>
+              </template>
+              <span>Transfers</span>
+            </v-tooltip>
+
+            <v-tooltip bottom style="z-index: 1000;">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn @click="clickSellItem" icon v-bind="attrs" v-on="on">
+                  <v-icon>mdi-point-of-sale</v-icon>
+                </v-btn>
+              </template>
+              <span>Sell Item</span>
+            </v-tooltip>
+
+            <v-tooltip bottom style="z-index: 1000;">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn @click="clickInventory" icon v-bind="attrs" v-on="on">
+                  <v-icon>mdi-warehouse</v-icon>
+                </v-btn>
+              </template>
+              <span>Inventory</span>
+            </v-tooltip>
+
+            <v-tooltip bottom style="z-index: 1000;">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn @click="clickReportViewer" icon v-bind="attrs" v-on="on">
+                  <v-icon>mdi-file-chart</v-icon>
+                </v-btn>
+              </template>
+              <span>Reports</span>
+            </v-tooltip>
+
+            <v-tooltip bottom style="z-index: 1000;">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn @click="clickAccountDetails" icon v-bind="attrs" v-on="on">
+                  <v-icon>mdi-account-details</v-icon>
+                </v-btn>
+              </template>
+              <span>Account</span>
+            </v-tooltip>
+
+            <v-btn @click="logout" icon>
+              <v-icon>mdi-power</v-icon>
+            </v-btn>
+          </v-col>
+        </v-row>
+      </div>
+>>>>>>> ec3576785b58f8e41d40a77f286344087f5a01ba:pages/yourstore.vue
     </v-app-bar>
     <v-main>
       <v-row>
         <!-- adding data-app to prevent error in v-select element -->
         <div data-app>
-          <ProfileComponent
-            :showprofileflag="showhideprof"
-            @profileformclose="closeFromProfile"
-            @reupdateproflist="getallprofiles"
-          >
+          <ProfileComponent :showprofileflag="showhideprof" @profileformclose="closeFromProfile" @reupdateproflist="getallprofiles">
           </ProfileComponent>
         </div>
 
@@ -111,57 +200,36 @@
         </div>
 
         <div data-app>
-          <SellItemComponent
-            :showflag="showhidesellitem"
-            @formclose="closeFromSellItem"
-          >
-          </SellItemComponent>
+          <SellItemComponent :showflag="showhidesellitem" @formclose="closeFromSellItem"> </SellItemComponent>
         </div>
 
         <div data-app>
-          <ReportViewerComponent :showflag="showhidereportviewer"
-            @formclose="closeFromReportViewer"
-          >
-          </ReportViewerComponent>
+          <ReportViewerComponent :showflag="showhidereportviewer" @formclose="closeFromReportViewer"> </ReportViewerComponent>
         </div>
 
         <div data-app>
-          <InventoryComponent
-            :showflag="showhideinventory"
-            @formclose="closeFromInventory"
-          >
-          </InventoryComponent>
+          <InventoryComponent :showflag="showhideinventory" @formclose="closeFromInventory"> </InventoryComponent>
         </div>
 
         <div data-app>
-          <ReceivingComponent
-            :showflag="showhideinventoryin"
-            @formclose="closeFromInventoryIn"
-          >
-          </ReceivingComponent>
+          <ReceivingComponent :showflag="showhideinventoryin" @formclose="closeFromInventoryIn"> </ReceivingComponent>
         </div>
 
         <div data-app>
-          <ItemTransferComponent
-            :showflag="showhideitemtransfer"
-            @formclose="closeFromItemTransfer"
-          >
-          </ItemTransferComponent>
+          <ItemTransferComponent :showflag="showhideitemtransfer" @formclose="closeFromItemTransfer"> </ItemTransferComponent>
         </div>
 
-        <v-card
-          class="mx-auto mt-10"
-          height="120"
-          width="300"
-          v-if="!connected"
-        >
+        <div data-app>
+          <AccountComponent :showflag="showhideaccountdetails" @formclose="closeFromItemTransfer"> </AccountComponent>
+        </div>
+
+        <v-card class="mx-auto mt-10" height="120" width="300" v-if="!connected">
           <v-row class="my-auto">
             <v-col class="text-center">
               <h3 style="color: maroon">Not connected to server!</h3>
               <h4 class="mt-4">Reloading in {{ remainingtime }}</h4>
               <v-container v-if="reconnecting">
-                <v-progress-circular indeterminate color="primary">
-                </v-progress-circular>
+                <v-progress-circular indeterminate color="primary"> </v-progress-circular>
               </v-container>
             </v-col>
           </v-row>
@@ -181,15 +249,21 @@ import ReportViewerComponent from "~/components/ReportViewerComponent";
 import InventoryComponent from "~/components/InventoryComponent";
 import ReceivingComponent from "~/components/ReceivingComponent";
 import ItemTransferComponent from "~/components/ItemTransferComponent";
+import AccountComponent from "../components/AccountComponent.vue";
 import moment from "moment";
 
 export default {
   components: {
-    ProfileComponent, ItemComponent,
-    SellItemComponent,ReportViewerComponent,InventoryComponent,
-    ReceivingComponent, ItemTransferComponent
+    ProfileComponent,
+    ItemComponent,
+    SellItemComponent,
+    ReportViewerComponent,
+    InventoryComponent,
+    ReceivingComponent,
+    ItemTransferComponent,
+    AccountComponent
   },
-  data: function () {
+  data: function() {
     return {
       ...mapState(["counter", "profileslistdata", "profiletypedata"]),
       loggedin: false,
@@ -200,9 +274,10 @@ export default {
       showhideinventory: false,
       showhideinventoryin: false,
       showhideitemtransfer: false,
+      showhideaccountdetails: false,
       connected: true,
       reconnecting: false,
-      remainingtime: 10,
+      remainingtime: 10
     };
   },
 
@@ -231,6 +306,7 @@ export default {
       "updateUserId",
       "updateUserToken"
     ]),
+<<<<<<< HEAD:pages/yourstore.vue
     backtohome(){
 
       this.$router.push('/')
@@ -246,6 +322,20 @@ export default {
 
       this.$router.push('/')
 
+=======
+    backtohome() {
+      this.$router.push("/");
+    },
+    async logout() {
+      this.loggedin = false;
+      let res = await this.callApi("POST", "/userinfo/logout", { uname: this.$store.state.userinfo.uname });
+      this.updateLegitUser(false);
+      this.updateUserInfo({});
+      this.updateUserId("");
+      this.updateUserToken("");
+
+      this.$router.push("/");
+>>>>>>> ec3576785b58f8e41d40a77f286344087f5a01ba:pages/yourstore.vue
     },
     clickProfile() {
       this.showhideprof = !this.showhideprof;
@@ -261,6 +351,9 @@ export default {
     clickReportViewer() {
       //this.$store.dispatch('actionShowHideProfile')
       this.showhidereportviewer = !this.showhidereportviewer;
+    },
+    clickAccountDetails() {
+      this.showhideaccountdetails = !this.showhideaccountdetails;
     },
     clickInventory() {
       this.showhideinventory = !this.showhideinventory;
@@ -292,6 +385,9 @@ export default {
     closeFromItemTransfer(showhide) {
       this.showhideitemtransfer = showhide;
     },
+    closeFromUser(showhide) {
+      this.showhideaccountdetails = showhide;
+    },
     //profiles
     async getallprofiles(state) {
       console.log("getting all profiles");
@@ -300,7 +396,7 @@ export default {
 
       //create the profiles array
       let profarray = [];
-      res.data.forEach((element) => {
+      res.data.forEach(element => {
         profarray.push(element.accountname);
       });
       this.updateProfileArray(profarray);
@@ -313,7 +409,7 @@ export default {
       this.updateItemList(res.data);
 
       let itemarray = [];
-      res.data.forEach((element) => {
+      res.data.forEach(element => {
         itemarray.push(element.itemdescrip);
       });
       this.updateItemArray(itemarray);
@@ -321,17 +417,15 @@ export default {
     async getallitemlocations(state) {
       console.log("getting all items locations");
       let res = await this.callApi("get", "/itemlocations");
-        console.log(res.data);
       this.updateItemLocations(res.data);
     },
     async getallitemtransfers(state) {
       console.log("getting all items transfers");
       let res = await this.callApi("GET", "/itemselltrans/itemtransferlist");
-        console.log(res.data);
-        //format the date
-        res.data.forEach(element => {
-          element.transdate = moment(element.transdate).format('MM/DD/YYYY');
-        });
+
+      res.data.forEach(element => {
+        element.transdate = moment(element.transdate).format("MM/DD/YYYY");
+      });
       this.updateItemTransferTrans(res.data);
     },
     async getallitemsizes(state) {
@@ -358,7 +452,7 @@ export default {
 
       //create the vendors array
       let vendorsarray = [];
-      res.data.forEach((element) => {
+      res.data.forEach(element => {
         vendorsarray.push(element.accountname);
       });
       this.updateVendorArray(vendorsarray);
@@ -425,21 +519,10 @@ export default {
           }
         }, 1000);
       }
-    },
+    }
   },
   //this displays on the server side
-  asyncData({
-    isDev,
-    route,
-    store,
-    env,
-    params,
-    query,
-    req,
-    res,
-    redirect,
-    error,
-  }) {
+  asyncData({ isDev, route, store, env, params, query, req, res, redirect, error }) {
     console.log("done loading");
   },
   async getalldata() {
@@ -448,7 +531,7 @@ export default {
   async created() {
     //checking connection to the API
     await this.firstcheck();
-    if (this.connected == true) {
+    if (this.connected == true && this.$store.state.legituser) {
       console.log("Loading Store data...");
       this.getallprofiles();
       this.getallvendors();
@@ -465,9 +548,12 @@ export default {
       this.getallitemprices();
       this.getallitemlocations();
       this.getallitemtransfers();
+    } else {
+      console.log("not gonna anything for you");
     }
 
     //check if user logged in
+<<<<<<< HEAD:pages/yourstore.vue
     if(this.$store.state.legituser){
       this.loggedin = true;
     } else
@@ -475,9 +561,15 @@ export default {
       this.$router.push('/')
     }
   },
+=======
+    if (this.$store.state.legituser) {
+      this.loggedin = true;
+    } else {
+      this.$router.push("/");
+    }
+  }
+>>>>>>> ec3576785b58f8e41d40a77f286344087f5a01ba:pages/yourstore.vue
 };
 </script>
 
-
-<style>
-</style>
+<style></style>
