@@ -4,6 +4,17 @@
       <v-toolbar-title>Valhalla Online Services</v-toolbar-title>
       <h1 class="mx-4" style="color: gray">|</h1>
 
+<div v-if="loggedin">
+  <v-row justify="end">
+      <v-tooltip bottom style="z-index: 1000;">
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn @click="backtohome" icon v-bind="attrs"  v-on="on">
+            <v-icon>mdi-home</v-icon>
+          </v-btn>
+        </template>
+        <span>Home</span>
+      </v-tooltip>
+
        <v-tooltip bottom style="z-index: 1000;">
         <template v-slot:activator="{ on, attrs }">
           <v-btn @click="clickProfile" icon v-bind="attrs"  v-on="on">
@@ -70,6 +81,11 @@
         <span>Reports</span>
       </v-tooltip>
 
+      <v-btn @click="logout" icon >
+        <v-icon>mdi-power</v-icon>
+      </v-btn>
+</v-row>
+</div>
 
     </v-app-bar>
     <v-main>
@@ -176,6 +192,7 @@ export default {
   data: function () {
     return {
       ...mapState(["counter", "profileslistdata", "profiletypedata"]),
+      loggedin: false,
       showhideprof: false,
       showhideitem: false,
       showhidesellitem: false,
@@ -209,7 +226,27 @@ export default {
       "updateProfGroupList",
       "updateItemLocations",
       "updateItemTransferTrans",
+      "updateLegitUser",
+      "updateUserInfo",
+      "updateUserId",
+      "updateUserToken"
     ]),
+    backtohome(){
+
+      this.$router.push('/')
+
+    },
+    async logout(){
+     	this.loggedin = false;
+      let res = await this.callApi("POST", "/userinfo/logout", {uname: this.$store.state.userinfo.uname});
+     	this.updateLegitUser(false);
+     	this.updateUserInfo({});
+	  	this.updateUserId('');
+      this.updateUserToken('');
+
+      this.$router.push('/')
+
+    },
     clickProfile() {
       this.showhideprof = !this.showhideprof;
     },
@@ -428,6 +465,14 @@ export default {
       this.getallitemprices();
       this.getallitemlocations();
       this.getallitemtransfers();
+    }
+
+    //check if user logged in
+    if(this.$store.state.legituser){
+      this.loggedin = true;
+    } else
+    {
+      this.$router.push('/')
     }
   },
 };
