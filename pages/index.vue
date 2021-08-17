@@ -124,6 +124,8 @@ export default {
 
     async login() {
       console.log('Logging in....');
+      //remove local token first
+       localStorage.removeItem('choya');
       let res = await this.callApi("POST", "/userinfo/login", {uname: this.uname, passw: this.passw});
         console.log(res.data);
         this.message = res.data.message;
@@ -137,7 +139,7 @@ export default {
 			this.updateUserId(dt.id);
 			this.updateUserToken(dt.relax);
 			// this.$router.push('/mainpage')
-        //   localStorage.setItem('suntoken', dt.relax);
+          localStorage.setItem('choya', dt.relax);
         //   localStorage.setItem('sunuserid', dt.id);
 
           //set header
@@ -151,6 +153,7 @@ export default {
     },
 
     logout(){
+      localStorage.removeItem('choya');
      	this.loggedin = false;
      	this.updateLegitUser(false);
      	this.updateUserInfo({});
@@ -159,13 +162,34 @@ export default {
       	this.message = '';
     }
   },
-  created(){
+  async created(){
 	  console.log('created');
+    //try to get the token in the localstorage
+    let choya = '';
+    if (typeof window !== 'undefined') {
+        choya = localStorage.getItem('choya');
+    }
+
     //check if user is present
     if(this.$store.state.legituser){
       this.loggedin = true;
       console.log('user logged in');
-    } else {
+    }
+    else if(choya !== '' || choya !== undefined){
+      //query from database if token is legit
+      let res = await this.callApi("POST", "/userinfo/checktoken", {token: choya});
+        console.log(res.data);
+        this.message = res.data.message;
+        let dt = res.data.userData;
+        if(res.data.status == "ok"){
+          console.log('this guy is for real');
+          this.loggedin = true;
+          this.updateLegitUser(true);
+          this.updateUserInfo(dt);
+          this.updateUserId(dt.id);
+        }
+    }
+    else {
       this.loggedin = false;
     }
 

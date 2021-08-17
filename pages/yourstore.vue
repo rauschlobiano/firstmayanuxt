@@ -4,91 +4,6 @@
       <v-toolbar-title>Valhalla Online Services</v-toolbar-title>
       <h1 class="mx-4" style="color: gray">|</h1>
 
-<<<<<<< HEAD:pages/yourstore.vue
-<div v-if="loggedin">
-  <v-row justify="end">
-      <v-tooltip bottom style="z-index: 1000;">
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn @click="backtohome" icon v-bind="attrs"  v-on="on">
-            <v-icon>mdi-home</v-icon>
-          </v-btn>
-        </template>
-        <span>Home</span>
-      </v-tooltip>
-
-       <v-tooltip bottom style="z-index: 1000;">
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn @click="clickProfile" icon v-bind="attrs"  v-on="on">
-            <v-icon>mdi-account-group</v-icon>
-          </v-btn>
-        </template>
-        <span>Profiles</span>
-      </v-tooltip>
-
-      <v-tooltip bottom style="z-index: 1000;">
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn @click="clickItem" icon v-bind="attrs"  v-on="on">
-            <v-icon>mdi-cart</v-icon>
-          </v-btn>
-        </template>
-        <span>Items</span>
-      </v-tooltip>
-
-
-      <v-tooltip bottom style="z-index: 1000;">
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn @click="clickInventoryIn" icon v-bind="attrs"  v-on="on">
-            <v-icon>mdi-truck</v-icon>
-          </v-btn>
-        </template>
-        <span>Receiving</span>
-      </v-tooltip>
-
-
-      <v-tooltip bottom style="z-index: 1000;">
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn @click="clickItemTransfer" icon v-bind="attrs"  v-on="on">
-            <v-icon>mdi-transfer</v-icon>
-          </v-btn>
-        </template>
-        <span>Transfers</span>
-      </v-tooltip>
-
-
-      <v-tooltip bottom style="z-index: 1000;">
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn @click="clickSellItem" icon v-bind="attrs"  v-on="on">
-            <v-icon>mdi-point-of-sale</v-icon>
-          </v-btn>
-        </template>
-        <span>Sell Item</span>
-      </v-tooltip>
-
-      <v-tooltip bottom style="z-index: 1000;">
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn @click="clickInventory" icon v-bind="attrs"  v-on="on">
-            <v-icon>mdi-warehouse</v-icon>
-          </v-btn>
-        </template>
-        <span>Inventory</span>
-      </v-tooltip>
-
-      <v-tooltip bottom style="z-index: 1000;">
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn @click="clickReportViewer" icon v-bind="attrs"  v-on="on">
-            <v-icon>mdi-file-chart</v-icon>
-          </v-btn>
-        </template>
-        <span>Reports</span>
-      </v-tooltip>
-
-      <v-btn @click="logout" icon >
-        <v-icon>mdi-power</v-icon>
-      </v-btn>
-</v-row>
-</div>
-
-=======
       <div v-if="loggedin">
         <v-row justify="center">
           <v-col class="text-center">
@@ -179,7 +94,6 @@
           </v-col>
         </v-row>
       </div>
->>>>>>> ec3576785b58f8e41d40a77f286344087f5a01ba:pages/yourstore.vue
     </v-app-bar>
     <v-main>
       <v-row>
@@ -306,23 +220,6 @@ export default {
       "updateUserId",
       "updateUserToken"
     ]),
-<<<<<<< HEAD:pages/yourstore.vue
-    backtohome(){
-
-      this.$router.push('/')
-
-    },
-    async logout(){
-     	this.loggedin = false;
-      let res = await this.callApi("POST", "/userinfo/logout", {uname: this.$store.state.userinfo.uname});
-     	this.updateLegitUser(false);
-     	this.updateUserInfo({});
-	  	this.updateUserId('');
-      this.updateUserToken('');
-
-      this.$router.push('/')
-
-=======
     backtohome() {
       this.$router.push("/");
     },
@@ -335,7 +232,6 @@ export default {
       this.updateUserToken("");
 
       this.$router.push("/");
->>>>>>> ec3576785b58f8e41d40a77f286344087f5a01ba:pages/yourstore.vue
     },
     clickProfile() {
       this.showhideprof = !this.showhideprof;
@@ -549,26 +445,16 @@ export default {
       this.getallitemlocations();
       this.getallitemtransfers();
     } else {
-      console.log("not gonna anything for you");
+      console.log("not gonna load anything for you");
     }
 
     //check if user logged in
-<<<<<<< HEAD:pages/yourstore.vue
-    if(this.$store.state.legituser){
-      this.loggedin = true;
-    } else
-    {
-      this.$router.push('/')
-    }
-  },
-=======
     if (this.$store.state.legituser) {
       this.loggedin = true;
     } else {
       this.$router.push("/");
     }
   }
->>>>>>> ec3576785b58f8e41d40a77f286344087f5a01ba:pages/yourstore.vue
 };
 </script>
 
